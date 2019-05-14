@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,10 +16,28 @@ namespace Xamarin.Forms.Controls.XamStore
 	[XamlCompilation(XamlCompilationOptions.Compile)]
 	public partial class StoreShell : TestShell
 	{
-		public StoreShell() 
+		public StoreShell()
 		{
 			InitializeComponent();
 			CurrentItem = _storeItem;
+
+			var storeShellViewModel = new StoreShellViewModel() { BadgeText = "1" };
+			BindingContext = storeShellViewModel;
+
+			// BindingContext is not propagated to ShellContent when ShellSection is created implicitly via ShellSection.CreateFromShellContent
+			this.Items[5].Items[0].Items[0].BindingContext = this.BindingContext;
+
+			Task.Run(async () =>
+			{
+				for (int i = 0; i < 100; i++)
+				{
+					await Task.Delay(500);
+
+					Device.BeginInvokeOnMainThread(() => {
+						((StoreShellViewModel)this.BindingContext).BadgeText = i.ToString();
+					});
+				}
+			});
 		}
 
 		protected override void Init()
@@ -62,5 +82,28 @@ namespace Xamarin.Forms.Controls.XamStore
 		//	allow = !allow;
 		//	base.OnNavigating(args);
 		//}
+	}
+
+	[Preserve(AllMembers = true)]
+	public class StoreShellViewModel : INotifyPropertyChanged
+	{
+		string _badgeText;
+
+		public string BadgeText
+		{
+			get => _badgeText;
+			set
+			{
+				_badgeText = value;
+				OnPropertyChanged();
+			}
+		}
+
+		public event PropertyChangedEventHandler PropertyChanged;
+
+		protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+		{
+			PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+		}
 	}
 }
