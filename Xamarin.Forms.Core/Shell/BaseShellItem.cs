@@ -46,6 +46,15 @@ namespace Xamarin.Forms
 									propertyChanged: OnTabStopPropertyChanged,
 									defaultValueCreator: TabStopDefaultValueCreator);
 
+		public static readonly BindableProperty BadgeTextProperty =
+			BindableProperty.Create(nameof(BadgeText), typeof(string), typeof(BaseShellItem), null, BindingMode.TwoWay);
+
+		public static readonly BindableProperty BadgeTextColorProperty =
+			BindableProperty.Create(nameof(BadgeTextColor), typeof(Color), typeof(BaseShellItem), null, BindingMode.TwoWay);
+
+		public static readonly BindableProperty BadgeColorProperty =
+			BindableProperty.Create(nameof(BadgeColor), typeof(Color), typeof(BaseShellItem), null, BindingMode.TwoWay);
+
 		static void OnTabIndexPropertyChanged(BindableObject bindable, object oldValue, object newValue) =>
 			((BaseShellItem)bindable).OnTabIndexPropertyChanged((int)oldValue, (int)newValue);
 
@@ -104,6 +113,24 @@ namespace Xamarin.Forms
 		{
 			get => (bool)GetValue(IsTabStopProperty);
 			set => SetValue(IsTabStopProperty, value);
+		}
+
+		public string BadgeText
+		{
+			get { return (string)GetValue(BadgeTextProperty); }
+			set { SetValue(BadgeTextProperty, value); }
+		}
+
+		public Color BadgeTextColor
+		{
+			get { return (Color)GetValue(BadgeTextColorProperty); }
+			set { SetValue(BadgeTextColorProperty, value); }
+		}
+
+		public Color BadgeColor
+		{
+			get { return (Color)GetValue(BadgeColorProperty); }
+			set { SetValue(BadgeColorProperty, value); }
 		}
 
 		protected virtual void OnTabStopPropertyChanged(bool oldValue, bool newValue) { }

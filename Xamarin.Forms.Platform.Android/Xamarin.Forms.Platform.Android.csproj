@@ -65,6 +65,7 @@
     <Compile Include="BackgroundManager.cs" />
     <Compile Include="AppCompat\ILifeCycleState.cs" />
     <Compile Include="AppCompat\ShellFragmentContainer.cs" />
+    <Compile Include="BadgeHelper.cs" />
     <Compile Include="BorderBackgroundManager.cs" />
     <Compile Include="CollectionView\CarouselViewRenderer.cs" />
     <Compile Include="CollectionView\CenterSnapHelper.cs" />

@@ -181,6 +181,16 @@ namespace Xamarin.Forms.Platform.iOS
 
 				if (goTo)
 					GoTo(ShellItem.CurrentItem);
+
+				for (i = 0; i < ViewControllers.Length; i++)
+				{
+					var renderer = RendererForViewController(ViewControllers[i]);
+
+					if (!renderer.IsInMoreTab)
+					{
+						ApplyBadge(TabBar.Items[i], renderer.ShellSection);
+					}
+				}
 			}
 
 			SetTabBarHidden(ViewControllers.Length == 1);
@@ -202,6 +212,19 @@ namespace Xamarin.Forms.Platform.iOS
 				var renderer = RendererForShellContent(shellSection);
 				var index = ViewControllers.ToList().IndexOf(renderer.ViewController);
 				TabBar.Items[index].Enabled = shellSection.IsEnabled;
+			}
+			else if (e.PropertyName == ShellSection.BadgeTextProperty.PropertyName || 
+				e.PropertyName == ShellSection.BadgeTextColorProperty.PropertyName ||
+				e.PropertyName == ShellSection.BadgeColorProperty.PropertyName)
+			{
+				var shellSection = (ShellSection)sender;
+				var renderer = RendererForShellContent(shellSection);
+				var index = ViewControllers.ToList().IndexOf(renderer.ViewController);
+
+				if (!renderer.IsInMoreTab)
+				{
+					ApplyBadge(TabBar.Items[index], renderer.ShellSection);
+				}
 			}
 		}
 
@@ -258,9 +281,14 @@ namespace Xamarin.Forms.Platform.iOS
 				{
 					TabBar.Items[i].Enabled = false;
 				}
+
+				if (!renderer.IsInMoreTab)
+				{
+					ApplyBadge(TabBar.Items[i], renderer.ShellSection);
+				}
 			}
 		}
-			   
+
 		void GoTo(ShellSection shellSection)
 		{
 			if (shellSection == null || _currentSection == shellSection)
@@ -365,6 +393,21 @@ namespace Xamarin.Forms.Platform.iOS
 			{
 				SetTabBarHidden(hidden);
 			}
+		}
+
+		void ApplyBadge(UITabBarItem tabBarItem, ShellSection shellSection)
+		{
+			tabBarItem.BadgeValue = shellSection.BadgeText;
+			tabBarItem.BadgeColor = shellSection.BadgeColor.IsDefault ? null : shellSection.BadgeColor.ToUIColor();
+
+			var stringAttributes = new UIStringAttributes();
+
+			if (!shellSection.BadgeTextColor.IsDefault)
+			{
+				stringAttributes.ForegroundColor = shellSection.BadgeTextColor.ToUIColor();
+			}
+
+			tabBarItem.SetBadgeTextAttributes(stringAttributes, UIControlState.Normal);
 		}
 	}
 }

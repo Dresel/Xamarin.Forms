@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Threading.Tasks;
+using Android.Support.Design.Internal;
 using AColor = Android.Graphics.Color;
 using AView = Android.Views.View;
 using ColorStateList = Android.Content.Res.ColorStateList;
@@ -288,6 +289,22 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				SetupMenu();
 			}
+			else if (e.PropertyName == ShellSection.BadgeTextProperty.PropertyName ||
+				e.PropertyName == ShellSection.BadgeTextColorProperty.PropertyName ||
+				e.PropertyName == ShellSection.BadgeColorProperty.PropertyName)
+			{
+				var content = (ShellSection)sender;
+				var index = ShellItem.Items.IndexOf(content);
+
+				var itemCount = ShellItem.Items.Count;
+				var maxItems = _bottomView.MaxItemCount;
+
+				if (itemCount > maxItems && index > maxItems - 2)
+					return;
+
+				var menuItem = _bottomView.Menu.FindItem(index);
+				UpdateShellSectionBadge(content, menuItem);
+			}
 		}
 
 		protected virtual void OnTabReselected(ShellSection shellSection)
@@ -338,6 +355,16 @@ namespace Xamarin.Forms.Platform.Android
 					menuItem.SetChecked(true);
 			}
 
+			using (var bottomNavigationMenuView = (BottomNavigationMenuView)_bottomView.GetChildAt(0))
+			{
+				for (int i = 0; i < end; i++)
+				{
+					var item = shellItem.Items[i];
+					bottomNavigationMenuView.FindViewById<BottomNavigationItemView>(i)
+						.ApplyBadge(item.BadgeColor, item.BadgeText, item.BadgeTextColor);
+				}
+			}
+
 			UpdateTabBarVisibility();
 
 			_bottomView.SetShiftMode(false, false);
@@ -354,6 +381,15 @@ namespace Xamarin.Forms.Platform.Android
 			bool tabEnabled = shellSection.IsEnabled;
 			if (menuItem.IsEnabled != tabEnabled)
 				menuItem.SetEnabled(tabEnabled);
+		}
+
+		protected virtual void UpdateShellSectionBadge(ShellSection shellSection, IMenuItem menuItem)
+		{
+			using (BottomNavigationMenuView bottomNavigationMenuView = ((BottomNavigationMenuView)_bottomView.GetChildAt(0)))
+			{
+				BottomNavigationItemView itemView = bottomNavigationMenuView.FindViewById<BottomNavigationItemView>(menuItem.ItemId);
+				itemView.ApplyBadge(shellSection.BadgeColor, shellSection.BadgeText, shellSection.BadgeTextColor);
+			}
 		}
 
 		void OnDisplayedElementPropertyChanged(object sender, PropertyChangedEventArgs e)
