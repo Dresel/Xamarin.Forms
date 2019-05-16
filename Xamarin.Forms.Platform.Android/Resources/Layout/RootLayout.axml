@@ -22,7 +22,7 @@
 				
 							/>
 			
-		<android.support.design.widget.TabLayout 
+		<Xamarin.Forms.Platform.Android.Tabsi 
 				android:id="@+id/main.tablayout"
 				android:layout_width="match_parent"
 				android:layout_height="?attr/actionBarSize"

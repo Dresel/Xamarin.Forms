@@ -8,6 +8,9 @@ using System;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using Android.Content;
+using Android.Util;
+using Android.Widget;
 using Xamarin.Forms.Platform.Android.AppCompat;
 using AView = Android.Views.View;
 using Fragment = Android.Support.V4.App.Fragment;
@@ -16,6 +19,113 @@ using Toolbar = Android.Support.V7.Widget.Toolbar;
 
 namespace Xamarin.Forms.Platform.Android
 {
+	public class Tabsi : TabLayout
+	{
+		protected Tabsi(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+		{
+		}
+
+		public Tabsi(Context context) : base(context)
+		{
+		}
+
+		public Tabsi(Context context, IAttributeSet attrs) : base(context, attrs)
+		{
+		}
+
+		public Tabsi(Context context, IAttributeSet attrs, int defStyleAttr) : base(context, attrs, defStyleAttr)
+		{
+		}
+
+		public override void AddTab(Tab tab)
+		{
+			base.AddTab(tab);
+		}
+
+		public override void AddTab(Tab tab, bool setSelected)
+		{
+			base.AddTab(tab, setSelected);
+		}
+
+		public override void AddTab(Tab tab, int position)
+		{
+			base.AddTab(tab, position);
+		}
+
+		public override void AddTab(Tab tab, int position, bool setSelected)
+		{
+			//FrameLayout frameLayout = new FrameLayout(this.Context);
+			//LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(LP.WrapContent, LP.WrapContent);
+			//frameLayout.LayoutParameters = layoutParams;
+
+			//LayoutInflater inflater = (LayoutInflater)Context.GetSystemService(Context.LayoutInflaterService);
+
+			//TextView tabText = (TextView)inflater.Inflate(Resource.Layout.design_layout_tab_text, frameLayout);
+			//tabText.Text = "1";
+			//tabText.Id = Context.Resources.GetIdentifier("text1", "id", Context.PackageName);
+			//frameLayout.AddView(tabText);
+
+			//AView tabIcon = inflater.Inflate(Resource.Layout.design_layout_tab_icon, frameLayout, true);
+			//tabIcon.Id = Context.Resources.GetIdentifier("icon", "id", Context.PackageName);
+
+			//frameLayout.AddView(tabIcon);
+
+			//var textView = new TextView(this.Context) { Id = Context.Resources.GetIdentifier("text1", "id", Context.PackageName), Text = "Test" };
+			//textVIew
+
+			//textView.LayoutParameters = layoutParams;
+
+			//linearLayout.AddView(textView);
+			tab.View.SetClipChildren(false);
+			tab.View.SetClipToPadding(false);
+			tab.View.ApplyBadge(Color.Red, "11", Color.Default);
+
+			//AView findViewById = tab.View.FindViewById(global::Android.Resource.Id.Text1);
+
+			//TextView textView = tab.View.GetChildrenOfType<TextView>().Single();
+			//var indexOfTextView = tab.View.IndexOfChild(textView);
+
+			//tab.View.RemoveView(textView);
+			//tab.View.AddView(BadgeHelper.Merge(textView, Color.Red, "Text", Color.Default), indexOfTextView);
+
+			//tab.SetCustomView(Resource.Layout.CustomTabView);
+
+			//var textView = tab.CustomView.FindViewById<TextView>(global::Android.Resource.Id.Text1);
+			//textView.SetTextColor(TabTextColors);
+
+			//((ViewGroup)tab.CustomView).ApplyBadge(Color.Red, "1", Color.Default);
+
+			//BadgeHelper.Merge((global::Android.Widget.RelativeLayout)tab.CustomView, textView, Color.Red, "1",
+			//	Color.Default);
+
+			//((ViewGroup)tab.CustomView).ApplyBadge2(Color.Red, "1", Color.Default);
+
+			base.AddTab(tab, position, setSelected);
+		}
+
+		[Obsolete("deprecated")]
+		public override void SetTabsFromPagerAdapter(PagerAdapter adapter)
+		{
+			base.SetTabsFromPagerAdapter(adapter);
+
+			for (int i = 0; i < this.TabCount; i++)
+			{
+				Tab tabAt = this.GetTabAt(i);
+				//((LinearLayout)tabAt.View.GetChildAt(0)).ApplyBadge(Color.Green, "1", Color.Default);
+			}
+		}
+
+		public override void SetupWithViewPager(ViewPager viewPager)
+		{
+			base.SetupWithViewPager(viewPager);
+		}
+
+		public override void SetupWithViewPager(ViewPager viewPager, bool autoRefresh)
+		{
+			base.SetupWithViewPager(viewPager, autoRefresh);
+		}
+	}
+
 	public class ShellSectionRenderer : Fragment, IShellSectionRenderer, ViewPager.IOnPageChangeListener, AView.IOnClickListener, IShellObservableFragment, IAppearanceObserver
 	{
 		#region IOnPageChangeListener
@@ -96,7 +206,8 @@ namespace Xamarin.Forms.Platform.Android
 		readonly IShellContext _shellContext;
 		AView _rootView;
 		bool _selecting;
-		TabLayout _tablayout;
+		Tabsi _tablayout;
+
 		IShellTabLayoutAppearanceTracker _tabLayoutAppearanceTracker;
 		Toolbar _toolbar;
 		IShellToolbarAppearanceTracker _toolbarAppearanceTracker;
@@ -127,7 +238,19 @@ namespace Xamarin.Forms.Platform.Android
 
 			_toolbar = root.FindViewById<Toolbar>(Resource.Id.main_toolbar);
 			var scrollview = root.FindViewById<NestedScrollView>(Resource.Id.main_scrollview);
-			_tablayout = root.FindViewById<TabLayout>(Resource.Id.main_tablayout);
+			_tablayout = root.FindViewById<Tabsi>(Resource.Id.main_tablayout);
+
+			_tablayout.SetClipChildren(false);
+			_tablayout.SetClipToPadding(false);
+
+			ViewGroup realTabs = ((ViewGroup)_tablayout.GetChildAt(0));
+			realTabs.SetClipToPadding(false);
+			realTabs.SetClipChildren(false);
+
+			if (realTabs.GetChildAt(0) is ViewGroup) { // <-- This is the intermediate parent ViewGroup
+				((ViewGroup)realTabs.GetChildAt(0)).SetClipToPadding(false);
+				((ViewGroup)realTabs.GetChildAt(0)).SetClipChildren(false);
+			}
 
 			_viewPager = new FormsViewPager(Context)
 			{
