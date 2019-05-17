@@ -293,13 +293,29 @@ namespace Xamarin.Forms.Controls.XamStore
 		private void AddTopTab()
 		{
 			var shellSection = (ShellSection)Parent.Parent;
+			var shellContent = new Forms.ShellContent()
+			{
+				Title = "New Top Tab",
+				Content = new UpdatesPage()
+			};
+
 			shellSection.Items.Add(
-				new Forms.ShellContent()
-					{
-						Title = "New Top Tab",
-						Content = new UpdatesPage()
-					}
+				shellContent
 				);
+
+			Task.Run(async () =>
+			{
+				for (int i = 1; i < 100; i++)
+				{
+					await Task.Delay(500);
+
+					Device.BeginInvokeOnMainThread(() =>
+					{
+						shellContent.BadgeColor = Color.DodgerBlue;
+						shellContent.BadgeText = i.ToString();
+					});
+				}
+			});
 		}
 
 		private void RemoveBottomTab()
