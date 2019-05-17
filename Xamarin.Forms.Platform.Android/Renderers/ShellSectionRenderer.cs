@@ -142,6 +142,12 @@ namespace Xamarin.Forms.Platform.Android
 
 			_tablayout.SetupWithViewPager(_viewPager);
 
+			ViewGroup tabStrip = ((ViewGroup)_tablayout.GetChildAt(0));
+			tabStrip.SetClipToPadding(false);
+			tabStrip.SetClipChildren(false);
+
+			ApplyBadges();
+
 			var currentPage = ((IShellContentController)shellSection.CurrentItem).GetOrCreateContent();
 			var currentIndex = ShellSection.Items.IndexOf(ShellSection.CurrentItem);
 
@@ -206,8 +212,25 @@ namespace Xamarin.Forms.Platform.Android
 			AnimationFinished?.Invoke(this, e);
 		}
 
-		protected virtual void OnItemsCollectionChagned(object sender, NotifyCollectionChangedEventArgs e) =>
+		protected virtual void OnItemsCollectionChagned(object sender, NotifyCollectionChangedEventArgs e)
+		{
 			_tablayout.Visibility = (ShellSection.Items.Count > 1) ? ViewStates.Visible : ViewStates.Gone;
+
+			if (e.OldItems != null)
+			{
+				foreach (ShellContent shellContent in e.OldItems)
+					UnhookChildEvents(shellContent);
+			}
+
+			if (e.NewItems != null)
+			{
+				foreach (ShellContent shellContent in e.NewItems)
+				{
+					ApplyBadge(shellContent);
+					HookChildEvents(shellContent);
+				}
+			}
+		}
 
 		protected virtual void OnShellItemPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
@@ -242,13 +265,60 @@ namespace Xamarin.Forms.Platform.Android
 			((INotifyCollectionChanged)ShellSection.Items).CollectionChanged += OnItemsCollectionChagned;
 			((IShellController)_shellContext.Shell).AddAppearanceObserver(this, ShellSection);
 			ShellSection.PropertyChanged += OnShellItemPropertyChanged;
+
+			foreach (var shellContent in ShellSection.Items)
+			{
+				HookChildEvents(shellContent);
+			}
+		}
+
+		protected virtual void HookChildEvents(ShellContent shellContent)
+		{
+			shellContent.PropertyChanged += OnShellContentPropertyChanged;
 		}
 
 		void UnhookEvents()
 		{
+			foreach (var shellContent in ShellSection.Items)
+			{
+				UnhookChildEvents(shellContent);
+			}
+
 			((INotifyCollectionChanged)ShellSection.Items).CollectionChanged -= OnItemsCollectionChagned;
 			((IShellController)_shellContext.Shell).RemoveAppearanceObserver(this);
 			ShellSection.PropertyChanged -= OnShellItemPropertyChanged;
+		}
+
+		protected virtual void UnhookChildEvents(ShellContent shellContent)
+		{
+			shellContent.PropertyChanged -= OnShellContentPropertyChanged;
+		}
+
+		void OnShellContentPropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeTextColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeColorProperty.PropertyName)
+			{
+				ApplyBadge((ShellContent)sender);
+			}
+		}
+
+		void ApplyBadges()
+		{
+			foreach (ShellContent shellContent in this.ShellSection.Items)
+			{
+				ApplyBadge(shellContent);
+			}
+		}
+
+		void ApplyBadge(ShellContent shellContent)
+		{
+			var indexOf = this.ShellSection.Items.IndexOf(shellContent);
+			var tabView = _tablayout.GetTabAt(indexOf).View;
+
+			// Device.BeginInvokeOnMainThread?
+			tabView.ApplyBadge(shellContent.BadgeColor, shellContent.BadgeText, shellContent.BadgeTextColor);
 		}
 	}
 }

@@ -4,108 +4,165 @@ using Android.Content;
 using Android.Graphics.Drawables;
 using Android.Graphics.Drawables.Shapes;
 using Android.Runtime;
+using Android.Support.Design.Internal;
+using Android.Support.Design.Widget;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
 using LP = Android.Views.ViewGroup.LayoutParams;
-using RL = Android.Widget.RelativeLayout;
 
 namespace Xamarin.Forms.Platform.Android
 {
 	internal static class BadgeHelper
 	{
-		public static void ApplyBadge(this ViewGroup view, Color color, string text,
+		public static void ApplyBadge(this BottomNavigationItemView bottomNavigationView, Color color, string text,
 			Color textColor)
 		{
-			if (!view.GetChildrenOfType<RL>().Any())
+			if (!bottomNavigationView.GetChildrenOfType<BadgeFrameLayout>().Any())
 			{
-				RL relativeLayout = new RL(view.Context);
+				bottomNavigationView.SetClipChildren(false);
+				bottomNavigationView.SetClipToPadding(false);
 
-				var relativeLayoutParameters =
-					new RL.LayoutParams(LP.MatchParent, LP.MatchParent);
-				relativeLayout.LayoutParameters = relativeLayoutParameters;
+				ImageView imageView = bottomNavigationView.GetChildrenOfType<ImageView>().Single();
+				bottomNavigationView.RemoveView(imageView);
 
-				relativeLayout.Visibility = !string.IsNullOrEmpty(text) ? ViewStates.Visible : ViewStates.Invisible;
+				FrameLayout badgeContainerFrameLayout = new FrameLayout(bottomNavigationView.Context)
+				{
+					LayoutParameters = new FrameLayout.LayoutParams(LP.WrapContent, LP.WrapContent)
+					{
+						Gravity = GravityFlags.CenterHorizontal
+					}
+				};
 
-				var space = new Space(view.Context);
+				badgeContainerFrameLayout.AddView(imageView);
 
-				space.Id = global::Android.Views.View.GenerateViewId();
+				BadgeFrameLayout badgeContainer = CreateBadgeContainer(bottomNavigationView.Context);
+				badgeContainer.TopMargin += 10;
 
-				var spaceLayoutParameters =
-					new RL.LayoutParams(0, 0);
-				spaceLayoutParameters.AddRule(LayoutRules.CenterHorizontal);
-				space.LayoutParameters = spaceLayoutParameters;
+				badgeContainer.Visibility = !string.IsNullOrEmpty(text) ? ViewStates.Visible : ViewStates.Invisible;
 
-				space.Visibility = ViewStates.Invisible;
+				badgeContainer.Background = CreateBadgeBackground(bottomNavigationView.Context, color);
+				badgeContainer.AddView(CreateBadgeText(bottomNavigationView.Context, text, textColor));
 
-				relativeLayout.AddView(space);
+				badgeContainerFrameLayout.AddView(badgeContainer);
 
-				var badgeFrameLayout = new BadgeFrameLayout(view.Context);
+				bottomNavigationView.AddView(badgeContainerFrameLayout);
 
-				var badgeLayoutParameters =
-					new RL.LayoutParams(LP.WrapContent, LP.WrapContent);
-				badgeLayoutParameters.AddRule(LayoutRules.RightOf, space.Id);
-				badgeLayoutParameters.AddRule(LayoutRules.AlignParentTop);
-
-				badgeLayoutParameters.TopMargin = (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 4,
-					view.Context.Resources.DisplayMetrics);
-				badgeLayoutParameters.MarginStart = (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 4,
-					view.Context.Resources.DisplayMetrics);
-				badgeLayoutParameters.LeftMargin = (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 4,
-					view.Context.Resources.DisplayMetrics);
-
-				badgeFrameLayout.LayoutParameters = badgeLayoutParameters;
-
-				badgeFrameLayout.SetPadding(
-					(int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 6, view.Context.Resources.DisplayMetrics),
-					(int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 2, view.Context.Resources.DisplayMetrics),
-					(int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 6, view.Context.Resources.DisplayMetrics),
-					(int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 2, view.Context.Resources.DisplayMetrics));
-
-				var badgeFrameLayoutBackground = new PaintDrawable();
-
-				badgeFrameLayoutBackground.Paint.Color = color.IsDefault ? Color.FromRgb(255, 59, 48).ToAndroid() : color.ToAndroid();
-
-				badgeFrameLayoutBackground.Shape = new RectShape();
-				badgeFrameLayoutBackground.SetCornerRadius(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8,
-					view.Context.Resources.DisplayMetrics));
-
-				badgeFrameLayout.Background = badgeFrameLayoutBackground;
-
-				var textView = new TextView(view.Context);
-
-				textView.Text = text;
-				textView.SetTextColor(textColor.IsDefault ? Color.White.ToAndroid() : textColor.ToAndroid());
-				textView.SetTextSize(ComplexUnitType.Sp, 10);
-
-				var textViewLayoutParameters =
-					new FrameLayout.LayoutParams(LP.WrapContent, LP.WrapContent);
-				textViewLayoutParameters.Gravity = GravityFlags.Center;
-
-				textView.LayoutParameters = textViewLayoutParameters;
-
-				badgeFrameLayout.AddView(textView);
-
-				relativeLayout.AddView(badgeFrameLayout);
-
-				view.AddView(relativeLayout);
 			}
 			else
 			{
-				RL relativeLayout = view.GetChildrenOfType<RL>().Single();
-				relativeLayout.Visibility = !string.IsNullOrEmpty(text) ? ViewStates.Visible : ViewStates.Invisible;
+				BadgeFrameLayout badgeContainer = bottomNavigationView.GetChildrenOfType<BadgeFrameLayout>().Single();
+				badgeContainer.Visibility = !string.IsNullOrEmpty(text) ? ViewStates.Visible : ViewStates.Invisible;
 
-				BadgeFrameLayout badgeFrameLayout = (BadgeFrameLayout)relativeLayout.GetChildAt(1);
-				((PaintDrawable)badgeFrameLayout.Background).Paint.Color = color.IsDefault ? Color.FromRgb(255, 59, 48).ToAndroid() : color.ToAndroid();
+				((PaintDrawable)badgeContainer.Background).Paint.Color = color.IsDefault ? Color.FromRgb(255, 59, 48).ToAndroid() : color.ToAndroid();
 
-				TextView textView = (TextView)badgeFrameLayout.GetChildAt(0);
+				TextView textView = (TextView)badgeContainer.GetChildAt(0);
 				textView.Text = text;
 				textView.SetTextColor(textColor.IsDefault ? Color.White.ToAndroid() : textColor.ToAndroid());
 			}
 		}
 
+		public static void ApplyBadge(this TabLayout.TabView tabView, Color color, string text,
+			Color textColor)
+		{
+			if (!tabView.GetChildrenOfType<BadgeFrameLayout>().Any())
+			{
+				tabView.SetClipChildren(false);
+				tabView.SetClipToPadding(false);
+
+				TextView tabTextView = tabView.GetChildrenOfType<TextView>().Single();
+				tabView.RemoveView(tabTextView);
+
+				FrameLayout badgeContainerFrameLayout = new FrameLayout(tabView.Context)
+				{
+					LayoutParameters = new FrameLayout.LayoutParams(LP.WrapContent, LP.WrapContent)
+				};
+
+				badgeContainerFrameLayout.AddView(tabTextView);
+
+				BadgeFrameLayout badgeContainer = CreateBadgeContainer(tabView.Context);
+				badgeContainer.Visibility = !string.IsNullOrEmpty(text) ? ViewStates.Visible : ViewStates.Invisible;
+
+				badgeContainer.Background = CreateBadgeBackground(tabView.Context, color);
+				badgeContainer.AddView(CreateBadgeText(tabView.Context, text, textColor));
+
+				badgeContainerFrameLayout.AddView(badgeContainer);
+
+				tabView.AddView(badgeContainerFrameLayout);
+			}
+			else
+			{
+				BadgeFrameLayout badgeContainer = tabView.GetChildrenOfType<BadgeFrameLayout>().Single();
+				badgeContainer.Visibility = !string.IsNullOrEmpty(text) ? ViewStates.Visible : ViewStates.Invisible;
+
+				((PaintDrawable)badgeContainer.Background).Paint.Color = color.IsDefault ? Color.FromRgb(255, 59, 48).ToAndroid() : color.ToAndroid();
+
+				TextView textView = (TextView)badgeContainer.GetChildAt(0);
+				textView.Text = text;
+				textView.SetTextColor(textColor.IsDefault ? Color.White.ToAndroid() : textColor.ToAndroid());
+			}
+		}
+
+		static BadgeFrameLayout CreateBadgeContainer(Context context)
+		{
+			BadgeFrameLayout badgeFrameLayout = new BadgeFrameLayout(context)
+			{
+				LayoutParameters = new FrameLayout.LayoutParams(LP.WrapContent, LP.WrapContent)
+				{
+					Gravity = GravityFlags.Top | GravityFlags.Right
+				}
+			};
+
+			badgeFrameLayout.SetPadding(
+				(int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 6, context.Resources.DisplayMetrics),
+				(int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 2, context.Resources.DisplayMetrics),
+				(int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 6, context.Resources.DisplayMetrics),
+				(int)TypedValue.ApplyDimension(ComplexUnitType.Dip, 2, context.Resources.DisplayMetrics));
+
+			return badgeFrameLayout;
+		}
+
+		static TextView CreateBadgeText(Context context, string text, Color textColor)
+		{
+			var textView = new TextView(context)
+			{
+				Text = text,
+				LayoutParameters = new FrameLayout.LayoutParams(LP.WrapContent, LP.WrapContent)
+				{
+					Gravity = GravityFlags.Center
+				}
+			};
+
+			textView.SetTextColor(textColor.IsDefault ? Color.White.ToAndroid() : textColor.ToAndroid());
+			textView.SetTextSize(ComplexUnitType.Sp, 10);
+
+			return textView;
+		}
+
+		static PaintDrawable CreateBadgeBackground(Context context, Color color)
+		{
+			var badgeFrameLayoutBackground = new PaintDrawable();
+
+			badgeFrameLayoutBackground.Paint.Color =
+				color.IsDefault ? Color.FromRgb(255, 59, 48).ToAndroid() : color.ToAndroid();
+
+			badgeFrameLayoutBackground.Shape = new RectShape();
+			badgeFrameLayoutBackground.SetCornerRadius(TypedValue.ApplyDimension(ComplexUnitType.Dip, 8,
+				context.Resources.DisplayMetrics));
+
+			return badgeFrameLayoutBackground;
+		}
+
 		internal class BadgeFrameLayout : FrameLayout
 		{
+			public int TopMargin { get; set; } = 10;
+
+			public int RightMargin { get; set; } = 10;
+
+			protected BadgeFrameLayout(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+			{
+			}
+
 			public BadgeFrameLayout(Context context) : base(context)
 			{
 			}
@@ -114,17 +171,11 @@ namespace Xamarin.Forms.Platform.Android
 			{
 			}
 
-			public BadgeFrameLayout(Context context, IAttributeSet attrs, int defStyleAttr) : base(context, attrs,
-				defStyleAttr)
+			public BadgeFrameLayout(Context context, IAttributeSet attrs, int defStyleAttr) : base(context, attrs, defStyleAttr)
 			{
 			}
 
-			public BadgeFrameLayout(Context context, IAttributeSet attrs, int defStyleAttr, int defStyleRes) : base(context,
-				attrs, defStyleAttr, defStyleRes)
-			{
-			}
-
-			protected BadgeFrameLayout(IntPtr javaReference, JniHandleOwnership transfer) : base(javaReference, transfer)
+			public BadgeFrameLayout(Context context, IAttributeSet attrs, int defStyleAttr, int defStyleRes) : base(context, attrs, defStyleAttr, defStyleRes)
 			{
 			}
 
@@ -132,12 +183,13 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				base.OnMeasure(widthMeasureSpec, heightMeasureSpec);
 
-				var width = MeasuredWidth;
-				var height = MeasuredHeight;
+				if (this.LayoutParameters is MarginLayoutParams layoutParameters)
+				{
+					int rightMargin = -(this.MeasuredWidth - (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, RightMargin, Context.Resources.DisplayMetrics));
+					int topMargin = -(this.MeasuredHeight - (int)TypedValue.ApplyDimension(ComplexUnitType.Dip, TopMargin, Context.Resources.DisplayMetrics));
 
-				base.OnMeasure(
-					MeasureSpec.MakeMeasureSpec(width > height ? width : height, MeasureSpecMode.Exactly),
-					MeasureSpec.MakeMeasureSpec(height, MeasureSpecMode.Exactly));
+					layoutParameters.SetMargins(layoutParameters.LeftMargin, topMargin, rightMargin, layoutParameters.BottomMargin);
+				}
 			}
 		}
 	}
