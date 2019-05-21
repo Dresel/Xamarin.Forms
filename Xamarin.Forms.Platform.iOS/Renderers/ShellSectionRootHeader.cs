@@ -86,6 +86,8 @@ namespace Xamarin.Forms.Platform.iOS
 			else
 				headerCell.Label.TextColor = _unselectedColor.ToUIColor();
 
+			headerCell.ApplyBadge(shellContent.BadgeColor, shellContent.BadgeText, shellContent.BadgeTextColor);
+
 			return headerCell;
 		}
 
@@ -166,10 +168,13 @@ namespace Xamarin.Forms.Platform.iOS
 
 			CollectionView.RegisterClassForCell(typeof(ShellSectionHeaderCell), CellId);
 
+			// Move to HookEvents?
 			((IShellController)_shellContext.Shell).AddAppearanceObserver(this, ShellSection);
 			((INotifyCollectionChanged)ShellSection.Items).CollectionChanged += OnShellSectionItemsChanged;
 
 			UpdateSelectedIndex();
+
+			HookEvents();
 			ShellSection.PropertyChanged += OnShellSectionPropertyChanged;
 		}
 
@@ -179,9 +184,12 @@ namespace Xamarin.Forms.Platform.iOS
 
 			if (disposing)
 			{
+				// Move to UnhookEvents?
 				((IShellController)_shellContext.Shell).RemoveAppearanceObserver(this);
 				((INotifyCollectionChanged)ShellSection.Items).CollectionChanged -= OnShellSectionItemsChanged;
 				ShellSection.PropertyChanged -= OnShellSectionPropertyChanged;
+
+				UnhookEvents();
 
 				ShellSection = null;
 				_bar.RemoveFromSuperview();
@@ -225,6 +233,65 @@ namespace Xamarin.Forms.Platform.iOS
 		void OnShellSectionItemsChanged(object sender, NotifyCollectionChangedEventArgs e)
 		{
 			CollectionView.ReloadData();
+
+			if (e.OldItems != null)
+			{
+				foreach (ShellContent shellContent in e.OldItems)
+				{
+					UnhookChildEvents(shellContent);
+				}
+			}
+
+			if (e.NewItems != null)
+			{
+				foreach (ShellContent shellContent in e.NewItems)
+				{
+					HookChildEvents(shellContent);
+				}
+			}
+		}
+
+		void HookEvents()
+		{
+			foreach (var shellContent in ShellSection.Items)
+			{
+				HookChildEvents(shellContent);
+			}
+		}
+
+		protected virtual void HookChildEvents(ShellContent shellContent)
+		{
+			shellContent.PropertyChanged += OnShellContentPropertyChanged;
+		}
+
+		void UnhookEvents()
+		{
+			foreach (var shellContent in ShellSection.Items)
+			{
+				UnhookChildEvents(shellContent);
+			}
+		}
+
+		protected virtual void UnhookChildEvents(ShellContent shellContent)
+		{
+			shellContent.PropertyChanged -= OnShellContentPropertyChanged;
+		}
+
+		void OnShellContentPropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeTextColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeColorProperty.PropertyName)
+			{
+				// Following code does not work, would require to store a ShellContent to Cell Dictionary (https://stackoverflow.com/questions/35538106),
+				// but this will be necessary because ReloadData sets scroll position of collection view to 0
+				//var shellContent = (ShellContent)sender;
+				//var index = this.ShellSection.Items.IndexOf(shellContent);
+				//var headerCell = (ShellSectionHeaderCell)CollectionView.DequeueReusableCell(CellId, NSIndexPath.FromRowSection(index + 1, 1));
+
+				//headerCell.ApplyBadge(shellContent.BadgeColor, shellContent.BadgeText, shellContent.BadgeTextColor);
+				CollectionView.ReloadData();
+			}
 		}
 
 		public class ShellSectionHeaderCell : UICollectionViewCell
@@ -235,21 +302,66 @@ namespace Xamarin.Forms.Platform.iOS
 				Label = new UILabel();
 				Label.TextAlignment = UITextAlignment.Center;
 				Label.Font = UIFont.BoldSystemFontOfSize(14);
+
 				ContentView.AddSubview(Label);
+
+				BadgeLabel = new UILabel();
+				BadgeLabel.TextAlignment = UITextAlignment.Center;
+				BadgeLabel.Font = UIFont.SystemFontOfSize(13);
+				BadgeLabel.ClipsToBounds = true;
+				BadgeLabel.Layer.CornerRadius = 9;
+				BadgeLabel.BackgroundColor = UIColor.FromRGB(255, 59, 48);
+				BadgeLabel.TextColor = UIColor.White;
+
+				ContentView.AddSubview(BadgeLabel);
 			}
 
 			public UILabel Label { get; }
+
+			protected UILabel BadgeLabel { get; }
 
 			public override void LayoutSubviews()
 			{
 				base.LayoutSubviews();
 
 				Label.Frame = Bounds;
+
+				var bounds = new CGRect(0, 0, BadgeLabel.IntrinsicContentSize.Width + 10, BadgeLabel.IntrinsicContentSize.Height + 2);
+				bounds.Offset(Label.IntrinsicContentSize.Width + ((Bounds.Width - Label.IntrinsicContentSize.Width) / 2) - 6, (Bounds.Height - Label.IntrinsicContentSize.Height) / 2.0f - 8);
+
+				BadgeLabel.Frame = bounds;
 			}
 
 			public override CGSize SizeThatFits(CGSize size)
 			{
+				CGSize sizeThatFits = BadgeLabel.SizeThatFits(size);
+
 				return new CGSize(Label.SizeThatFits(size).Width + 30, 35);
+			}
+
+			public void ApplyBadge(Color color, string text, Color textColor)
+			{
+				if (color == Color.Default)
+				{
+					BadgeLabel.BackgroundColor = UIColor.FromRGB(255, 59, 48);
+				}
+				else
+				{
+					BadgeLabel.BackgroundColor = color.ToUIColor();
+				}
+
+				BadgeLabel.Text = text;
+
+				if (textColor == Color.Default)
+				{
+					BadgeLabel.TextColor = UIColor.White;
+				}
+				else
+				{
+					BadgeLabel.TextColor = textColor.ToUIColor();
+				}
+
+				BadgeLabel.Hidden = string.IsNullOrEmpty(text);
 			}
 		}
 	}
