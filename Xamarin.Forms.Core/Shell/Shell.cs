@@ -57,6 +57,12 @@ namespace Xamarin.Forms
 		public static readonly BindableProperty ItemTemplateProperty =
 			BindableProperty.CreateAttached(nameof(ItemTemplate), typeof(DataTemplate), typeof(Shell), null, BindingMode.OneTime);
 
+		public static readonly BindableProperty BadgeColorProperty =
+			BindableProperty.CreateAttached("BadgeColor", typeof(Color), typeof(Shell), default, BindingMode.OneTime);
+
+		public static Color GetBadgeColor(BindableObject obj) => (Color)obj.GetValue(BadgeColorProperty);
+		public static void SetBadgeColor(BindableObject obj, Color badgeColor) => obj.SetValue(BadgeColorProperty, badgeColor);
+
 		public static DataTemplate GetItemTemplate(BindableObject obj) => (DataTemplate)obj.GetValue(ItemTemplateProperty);
 		public static void SetItemTemplate(BindableObject obj, DataTemplate itemTemplate) => obj.SetValue(ItemTemplateProperty, itemTemplate);
 

@@ -52,9 +52,6 @@ namespace Xamarin.Forms
 		public static readonly BindableProperty BadgeTextColorProperty =
 			BindableProperty.Create(nameof(BadgeTextColor), typeof(Color), typeof(BaseShellItem), null, BindingMode.TwoWay);
 
-		public static readonly BindableProperty BadgeColorProperty =
-			BindableProperty.Create(nameof(BadgeColor), typeof(Color), typeof(BaseShellItem), null, BindingMode.TwoWay);
-
 		static void OnTabIndexPropertyChanged(BindableObject bindable, object oldValue, object newValue) =>
 			((BaseShellItem)bindable).OnTabIndexPropertyChanged((int)oldValue, (int)newValue);
 
@@ -121,16 +118,12 @@ namespace Xamarin.Forms
 			set { SetValue(BadgeTextProperty, value); }
 		}
 
+		public Color BadgeColor => Shell.GetBadgeColor(this);
+
 		public Color BadgeTextColor
 		{
 			get { return (Color)GetValue(BadgeTextColorProperty); }
 			set { SetValue(BadgeTextColorProperty, value); }
-		}
-
-		public Color BadgeColor
-		{
-			get { return (Color)GetValue(BadgeColorProperty); }
-			set { SetValue(BadgeColorProperty, value); }
 		}
 
 		protected virtual void OnTabStopPropertyChanged(bool oldValue, bool newValue) { }

@@ -21,6 +21,9 @@ namespace Xamarin.Forms.Internals
 			if (propertyName == null || propertyName == Shell.TabBarIsVisibleProperty.PropertyName)
 				BaseShellItem.PropagateFromParent(Shell.TabBarIsVisibleProperty, element);
 
+			//if (propertyName == null || propertyName == Shell.BadgeColorProperty.PropertyName)
+			//	BaseShellItem.PropagateFromParent(Shell.BadgeColorProperty, element);
+
 			foreach (var child in children)
 			{
 				if (child is IPropertyPropagationController view)

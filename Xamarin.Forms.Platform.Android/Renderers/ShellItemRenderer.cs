@@ -291,7 +291,7 @@ namespace Xamarin.Forms.Platform.Android
 			}
 			else if (e.PropertyName == ShellSection.BadgeTextProperty.PropertyName ||
 				e.PropertyName == ShellSection.BadgeTextColorProperty.PropertyName ||
-				e.PropertyName == ShellSection.BadgeColorProperty.PropertyName)
+				e.PropertyName == Shell.BadgeColorProperty.PropertyName)
 			{
 				var content = (ShellSection)sender;
 				var index = ShellItem.Items.IndexOf(content);

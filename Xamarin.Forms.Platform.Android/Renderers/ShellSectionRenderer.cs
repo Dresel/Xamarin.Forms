@@ -298,7 +298,7 @@ namespace Xamarin.Forms.Platform.Android
 		{
 			if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
 				e.PropertyName == BaseShellItem.BadgeTextColorProperty.PropertyName ||
-				e.PropertyName == BaseShellItem.BadgeColorProperty.PropertyName)
+				e.PropertyName == Shell.BadgeColorProperty.PropertyName)
 			{
 				ApplyBadge((ShellContent)sender);
 			}

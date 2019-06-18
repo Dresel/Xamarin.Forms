@@ -137,7 +137,7 @@ namespace Xamarin.Forms
 			result.SetBinding(IconProperty, new Binding(nameof(Icon), BindingMode.OneWay, source: shellSection));
 			result.SetBinding(FlyoutDisplayOptionsProperty, new Binding(nameof(FlyoutDisplayOptions), BindingMode.OneTime, source: shellSection));
 			result.SetBinding(FlyoutIconProperty, new Binding(nameof(FlyoutIcon), BindingMode.OneWay, source: shellSection));
-			result.SetBinding(BadgeColorProperty, new Binding(nameof(BadgeColor), BindingMode.OneWay, source: shellSection));
+			result.SetBinding(Shell.BadgeColorProperty, new Binding(nameof(BadgeColor), BindingMode.TwoWay, source: shellSection));
 			result.SetBinding(BadgeTextProperty, new Binding(nameof(BadgeText), BindingMode.OneWay, source: shellSection));
 			result.SetBinding(BadgeTextColorProperty, new Binding(nameof(BadgeTextColor), BindingMode.OneWay, source: shellSection));
 
@@ -163,7 +163,7 @@ namespace Xamarin.Forms
 			result.SetBinding(TitleProperty, new Binding(nameof(Title), BindingMode.OneWay, source: shellSection));
 			result.SetBinding(IconProperty, new Binding(nameof(Icon), BindingMode.OneWay, source: shellSection));
 			result.SetBinding(FlyoutDisplayOptionsProperty, new Binding(nameof(FlyoutDisplayOptions), BindingMode.OneTime, source: shellSection));
-			result.SetBinding(BadgeColorProperty, new Binding(nameof(BadgeColor), BindingMode.TwoWay, source: shellSection));
+			//result.SetBinding(Shell.BadgeColorProperty, new Binding(nameof(BadgeColor), BindingMode.TwoWay, source: shellSection));
 			result.SetBinding(BadgeTextProperty, new Binding(nameof(BadgeText), BindingMode.TwoWay, source: shellSection));
 			result.SetBinding(BadgeTextColorProperty, new Binding(nameof(BadgeTextColor), BindingMode.TwoWay, source: shellSection));
 

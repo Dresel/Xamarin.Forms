@@ -11,6 +11,7 @@
 			<Setter Property="Shell.TitleColor" Value="White" />
 			<Setter Property="Shell.DisabledColor" Value="#B4FFFFFF" />
 			<Setter Property="Shell.UnselectedColor" Value="#95FFFFFF" />
+            <Setter Property="Shell.BadgeColor" Value="Black" />
 		</Style>
 		<Style TargetType="ShellItem" BasedOn="{StaticResource BaseStyle}" />
 		<Style x:Key="GreenShell" TargetType="Element" BasedOn="{StaticResource BaseStyle}">
@@ -70,9 +71,9 @@
 	<ShellItem Route="store" x:Name="_storeItem" FlyoutDisplayOptions="AsMultipleItems">
 		<ShellContent Shell.ItemTemplate="{StaticResource ShellItemTemplate}" Route="home" Style="{StaticResource GreenShell}" Title="Home" Icon="home.png" FlyoutIcon="homeflyout.png" ContentTemplate="{DataTemplate local:HomePage}" BadgeText="{Binding BadgeText}" />
 		<ShellContent Route="list" Title="List"  Icon="games.png" FlyoutIcon="gamesflyout.png" ContentTemplate="{DataTemplate local:DemoShellPage}" BadgeText="7" />
-		<ShellContent Route="games" Style="{StaticResource GreenShell}" Title="Games" Icon="games.png" FlyoutIcon="gamesflyout.png" ContentTemplate="{DataTemplate local:GamesPage}" BadgeText="21" BadgeColor="#1976d2" />
+		<ShellContent Route="games" Style="{StaticResource GreenShell}" Title="Games" Icon="games.png" FlyoutIcon="gamesflyout.png" ContentTemplate="{DataTemplate local:GamesPage}" BadgeText="21" Shell.BadgeColor="#1976d2" />
 		<ShellContent Route="movies" Style="{StaticResource MoviesShell}" Title="Movies &amp; TV" 
-					  Icon="film.png" FlyoutIcon="filmflyout.png" ContentTemplate="{DataTemplate local:MoviesPage}" BadgeText="99+" BadgeColor="White" BadgeTextColor="Black">
+					  Icon="film.png" FlyoutIcon="filmflyout.png" ContentTemplate="{DataTemplate local:MoviesPage}" BadgeText="99+" Shell.BadgeColor="White" BadgeTextColor="Black">
 			<ShellContent.MenuItems>
 				<MenuItem Icon="film.png" Text="Open Movies App" />
 			</ShellContent.MenuItems>

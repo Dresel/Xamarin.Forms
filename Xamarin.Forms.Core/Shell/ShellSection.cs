@@ -202,7 +202,7 @@ namespace Xamarin.Forms
 			shellSection.SetBinding(TitleProperty, new Binding(nameof(Title), BindingMode.OneWay, source: shellContent));
 			shellSection.SetBinding(IconProperty, new Binding(nameof(Icon), BindingMode.OneWay, source: shellContent));
 			shellSection.SetBinding(FlyoutIconProperty, new Binding(nameof(FlyoutIcon), BindingMode.OneWay, source: shellContent));
-			shellSection.SetBinding(BadgeColorProperty, new Binding(nameof(BadgeColor), BindingMode.OneWay, source: shellContent));
+			//shellSection.SetBinding(Shell.BadgeColorProperty, new Binding(nameof(BadgeColor), BindingMode.OneWay, source: shellContent));
 			shellSection.SetBinding(BadgeTextProperty, new Binding(nameof(BadgeText), BindingMode.OneWay, source: shellContent));
 			shellSection.SetBinding(BadgeTextColorProperty, new Binding(nameof(BadgeTextColor), BindingMode.OneWay, source: shellContent));
 

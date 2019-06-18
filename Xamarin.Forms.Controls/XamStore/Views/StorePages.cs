@@ -311,7 +311,7 @@ namespace Xamarin.Forms.Controls.XamStore
 
 					Device.BeginInvokeOnMainThread(() =>
 					{
-						shellContent.BadgeColor = Color.DodgerBlue;
+						Shell.SetBadgeColor(shellContent, Color.DodgerBlue);
 						shellContent.BadgeText = i.ToString();
 					});
 				}
