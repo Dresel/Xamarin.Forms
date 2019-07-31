@@ -145,6 +145,40 @@ namespace Xamarin.Forms
 			BindableProperty.CreateAttached("UnselectedColor", typeof(Color), typeof(Shell), Color.Default,
 				propertyChanged: OnColorValueChanged);
 
+		public static readonly BindableProperty BadgeTextColorProperty =
+			BindableProperty.CreateAttached("BadgeTextColor", typeof(Color), typeof(Shell), Color.Default,
+				propertyChanged: PropagateBadgePropertyChanged(nameof(BaseShellItem.EffectiveBadgeTextColor)));
+
+		public static readonly BindableProperty BadgeUnselectedTextColorProperty =
+			BindableProperty.CreateAttached("BadgeUnselectedTextColor", typeof(Color), typeof(Shell), Color.Default,
+				propertyChanged: PropagateBadgePropertyChanged(nameof(BaseShellItem.EffectiveBadgeTextColor)));
+
+		public static readonly BindableProperty BadgeColorProperty =
+			BindableProperty.CreateAttached("BadgeColor", typeof(Color), typeof(Shell), Color.Default,
+				propertyChanged: PropagateBadgePropertyChanged(nameof(BaseShellItem.EffectiveBadgeColor)));
+
+		public static readonly BindableProperty BadgeUnselectedColorProperty =
+			BindableProperty.CreateAttached("BadgeUnselectedColor", typeof(Color), typeof(Shell), Color.Default,
+				propertyChanged: PropagateBadgePropertyChanged(nameof(BaseShellItem.EffectiveBadgeColor)));
+
+		public static readonly BindableProperty BadgeMoreTextProperty =
+			BindableProperty.CreateAttached("BadgeMoreText", typeof(string), typeof(Shell), null,
+				propertyChanged: PropagateBadgePropertyChanged(nameof(BaseShellItem.EffectiveBadgeMoreText)));
+
+		public static BindableProperty.BindingPropertyChangedDelegate PropagateBadgePropertyChanged(string propertyName) =>
+			(bindable, value, newValue) =>
+			{
+				if (bindable is BaseShellItem baseShellItemRoot)
+				{
+					baseShellItemRoot.NotifyBadgePropertyChanged(propertyName);
+				}
+
+				foreach (BaseShellItem baseShellItem in bindable.GetShellDescendants())
+				{
+					baseShellItem.NotifyBadgePropertyChanged(propertyName);
+				}
+			};
+
 		public static Color GetBackgroundColor(BindableObject obj) => (Color)obj.GetValue(BackgroundColorProperty);
 		public static void SetBackgroundColor(BindableObject obj, Color value) => obj.SetValue(BackgroundColorProperty, value);
 
@@ -174,6 +208,21 @@ namespace Xamarin.Forms
 
 		public static Color GetUnselectedColor(BindableObject obj) => (Color)obj.GetValue(UnselectedColorProperty);
 		public static void SetUnselectedColor(BindableObject obj, Color value) => obj.SetValue(UnselectedColorProperty, value);
+
+		public static Color GetBadgeTextColor(BindableObject obj) => (Color)obj.GetValue(BadgeTextColorProperty);
+		public static void SetBadgeTextColor(BindableObject obj, Color value) => obj.SetValue(BadgeTextColorProperty, value);
+
+		public static Color GetBadgeUnselectedTextColor(BindableObject obj) => (Color)obj.GetValue(BadgeUnselectedTextColorProperty);
+		public static void SetBadgeUnselectedTextColor(BindableObject obj, Color value) => obj.SetValue(BadgeUnselectedTextColorProperty, value);
+
+		public static Color GetBadgeColor(BindableObject obj) => (Color)obj.GetValue(BadgeColorProperty);
+		public static void SetBadgeColor(BindableObject obj, Color value) => obj.SetValue(BadgeColorProperty, value);
+
+		public static Color GetBadgeUnselectedColor(BindableObject obj) => (Color)obj.GetValue(BadgeUnselectedColorProperty);
+		public static void SetBadgeUnselectedColor(BindableObject obj, Color value) => obj.SetValue(BadgeUnselectedColorProperty, value);
+
+		public static string GetBadgeMoreText(BindableObject obj) => (string)obj.GetValue(BadgeMoreTextProperty);
+		public static void SetBadgeMoreText(BindableObject obj, string value) => obj.SetValue(BadgeMoreTextProperty, value);
 
 		static void OnColorValueChanged(BindableObject bindable, object oldValue, object newValue)
 		{
@@ -1093,6 +1142,29 @@ namespace Xamarin.Forms
 
 			return defaultValue;
 		}
+
+		public T GetInheritedBadgeProperty<T>(Element element, BindableProperty bindableProperty, Func<Element, T> propertyGetter, Func<T, bool> isDefault)
+		{
+			while (element != this && element != null)
+			{
+				if (element.IsSet(bindableProperty) && !isDefault(propertyGetter(element)))
+					return propertyGetter(element);
+
+				element = element.Parent;
+			}
+
+			return propertyGetter(this);
+		}
+
+		public Color GetInheritedBadgeTextColor(Element element) => GetInheritedBadgeProperty(element, BadgeTextColorProperty, GetBadgeTextColor, color => color.IsDefault);
+
+		public Color GetInheritedBadgeUnselectedTextColor(Element element) => GetInheritedBadgeProperty(element, BadgeUnselectedTextColorProperty, GetBadgeUnselectedTextColor, color => color.IsDefault);
+
+		public Color GetInheritedBadgeColor(Element element) => GetInheritedBadgeProperty(element, BadgeColorProperty, GetBadgeColor, color => color.IsDefault);
+
+		public Color GetInheritedBadgeUnselectedColor(Element element) => GetInheritedBadgeProperty(element, BadgeUnselectedColorProperty, GetBadgeUnselectedColor, color => color.IsDefault);
+
+		public string GetInheritedBadgeMoreText(Element element) => GetInheritedBadgeProperty(element, BadgeMoreTextProperty, GetBadgeMoreText, string.IsNullOrEmpty);
 
 		ShellAppearance GetAppearanceForPivot(Element pivot)
 		{

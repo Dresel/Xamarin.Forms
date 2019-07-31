@@ -205,6 +205,21 @@ namespace Xamarin.Forms.Platform.iOS
 
 				if (goTo)
 					GoTo(ShellItem.CurrentItem);
+
+				for (i = 0; i < ViewControllers.Length; i++)
+				{
+					var renderer = RendererForViewController(ViewControllers[i]);
+
+					if (!renderer.IsInMoreTab)
+					{
+						ApplyBadge(renderer.ShellSection, renderer.ShellSection.BadgeText, renderer.ShellSection.IsChecked, TabBar.Items[i]);
+					}
+				}
+
+				if (willUseMore)
+				{
+					ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
+				}
 			}
 
 			SetTabBarHidden(ViewControllers.Length == 1);
@@ -220,12 +235,32 @@ namespace Xamarin.Forms.Platform.iOS
 
 		protected virtual void OnShellSectionPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
+			int maxTabs = 5; // fetch this a better way
+
 			if (e.PropertyName == BaseShellItem.IsEnabledProperty.PropertyName)
 			{
 				var shellSection = (ShellSection)sender;
 				var renderer = RendererForShellContent(shellSection);
 				var index = ViewControllers.ToList().IndexOf(renderer.ViewController);
 				TabBar.Items[index].Enabled = shellSection.IsEnabled;
+			}
+			else if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
+				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeColor) ||
+				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeTextColor) ||
+				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeMoreText))
+			{
+				var shellSection = (ShellSection)sender;
+				var renderer = RendererForShellContent(shellSection);
+				var index = ViewControllers.ToList().IndexOf(renderer.ViewController);
+
+				if (renderer.IsInMoreTab)
+				{
+					ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
+				}
+				else
+				{
+					ApplyBadge(renderer.ShellSection, renderer.ShellSection.BadgeText, renderer.ShellSection.IsChecked, TabBar.Items[index]);
+				}
 			}
 		}
 
@@ -287,9 +322,19 @@ namespace Xamarin.Forms.Platform.iOS
 				{
 					TabBar.Items[i].Enabled = false;
 				}
+
+				if (!renderer.IsInMoreTab)
+				{
+					ApplyBadge(renderer.ShellSection, renderer.ShellSection.BadgeText, renderer.ShellSection.IsChecked, TabBar.Items[i]);
+				}
+			}
+
+			if (willUseMore)
+			{
+				ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
 			}
 		}
-			   
+
 		void GoTo(ShellSection shellSection)
 		{
 			if (shellSection == null || _currentSection == shellSection)
@@ -394,6 +439,24 @@ namespace Xamarin.Forms.Platform.iOS
 			{
 				SetTabBarHidden(hidden);
 			}
+		}
+
+		void ApplyBadge(BaseShellItem baseShellItem, string badgeText, bool isSelected, UITabBarItem tabBarItem)
+		{
+			tabBarItem.BadgeValue = !string.IsNullOrEmpty(badgeText) ? badgeText : null;
+			var badgeColor = baseShellItem.GetEffectiveBadgeColor(isSelected);
+			tabBarItem.BadgeColor = !badgeColor.IsDefault ? badgeColor.ToUIColor() : null;
+
+			var stringAttributes = new UIStringAttributes();
+
+			var badgeTextColor = baseShellItem.GetEffectiveBadgeTextColor(isSelected);
+
+			if (!badgeTextColor.IsDefault)
+			{
+				stringAttributes.ForegroundColor = badgeTextColor.ToUIColor();
+			}
+
+			tabBarItem.SetBadgeTextAttributes(stringAttributes, UIControlState.Normal);
 		}
 	}
 }

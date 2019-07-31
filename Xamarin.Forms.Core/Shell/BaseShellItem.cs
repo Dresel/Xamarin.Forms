@@ -17,7 +17,15 @@ namespace Xamarin.Forms
 
 		#region PropertyKeys
 
-		internal static readonly BindablePropertyKey IsCheckedPropertyKey = BindableProperty.CreateReadOnly(nameof(IsChecked), typeof(bool), typeof(BaseShellItem), false);
+		internal static readonly BindablePropertyKey IsCheckedPropertyKey = BindableProperty.CreateReadOnly(nameof(IsChecked), typeof(bool), typeof(BaseShellItem), false, propertyChanged: OnCheckedValueChanged);
+
+		static void OnCheckedValueChanged(BindableObject bindable, object oldvalue, object newvalue)
+		{
+			var baseShellItem = (BaseShellItem)bindable;
+
+			baseShellItem.OnPropertyChanged(nameof(BaseShellItem.EffectiveBadgeTextColor));
+			baseShellItem.OnPropertyChanged(nameof(BaseShellItem.EffectiveBadgeColor));
+		}
 
 		#endregion PropertyKeys
 
@@ -51,6 +59,9 @@ namespace Xamarin.Forms
 									defaultValue: true,
 									propertyChanged: OnTabStopPropertyChanged,
 									defaultValueCreator: TabStopDefaultValueCreator);
+
+		public static readonly BindableProperty BadgeTextProperty =
+			BindableProperty.Create(nameof(BadgeText), typeof(string), typeof(BaseShellItem), null, BindingMode.TwoWay);
 
 		static void OnTabIndexPropertyChanged(BindableObject bindable, object oldValue, object newValue) =>
 			((BaseShellItem)bindable).OnTabIndexPropertyChanged((int)oldValue, (int)newValue);
@@ -111,6 +122,51 @@ namespace Xamarin.Forms
 			get => (bool)GetValue(IsTabStopProperty);
 			set => SetValue(IsTabStopProperty, value);
 		}
+
+		public string BadgeText
+		{
+			get { return (string)GetValue(BadgeTextProperty); }
+			set { SetValue(BadgeTextProperty, value); }
+		}
+		public string BadgeMoreText => Shell.GetBadgeMoreText(this);
+
+		public Color BadgeTextColor => Shell.GetBadgeTextColor(this);
+
+		public Color BadgeUnselectedTextColor => Shell.GetBadgeTextColor(this);
+
+		public Color BadgeColor => Shell.GetBadgeColor(this);
+
+		public Color BadgeUnselectedColor => Shell.GetBadgeUnselectedColor(this);
+
+		public Color EffectiveBadgeTextColor => GetEffectiveBadgeTextColor(IsChecked);
+
+		public Color GetEffectiveBadgeTextColor(bool isSelected)
+		{
+			if (isSelected)
+			{
+				return Shell.Current.GetInheritedBadgeTextColor(this);
+			}
+
+			Color color = Shell.Current.GetInheritedBadgeUnselectedTextColor(this);
+
+			return !color.IsDefault ? color : Shell.Current.GetInheritedBadgeTextColor(this);
+		}
+
+		public Color EffectiveBadgeColor => GetEffectiveBadgeColor(IsChecked);
+
+		public Color GetEffectiveBadgeColor(bool isSelected)
+		{
+			if (isSelected)
+			{
+				return Shell.Current.GetInheritedBadgeColor(this);
+			}
+
+			Color color = Shell.Current.GetInheritedBadgeUnselectedColor(this);
+
+			return !color.IsDefault ? color : Shell.Current.GetInheritedBadgeColor(this);
+		}
+
+		public string EffectiveBadgeMoreText => Shell.Current.GetInheritedBadgeMoreText(this);
 
 		internal virtual void SendAppearing()
 		{
@@ -183,6 +239,11 @@ namespace Xamarin.Forms
 
 			var shellItem = (BaseShellItem)bindable;
 			shellItem.FlyoutIcon = (ImageSource)newValue;
+		}
+
+		internal void NotifyBadgePropertyChanged(string propertyName)
+		{
+			OnPropertyChanged(propertyName);
 		}
 
 		protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)

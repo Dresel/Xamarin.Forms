@@ -10,6 +10,7 @@ using Android.Widget;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using Xamarin.Forms.Internals;
 using AView = Android.Views.View;
 using LP = Android.Views.ViewGroup.LayoutParams;
@@ -173,7 +174,7 @@ namespace Xamarin.Forms.Platform.Android
 			container.LayoutParameters = new LP(LP.MatchParent, LP.WrapContent);
 			linearLayout.AddView(container);
 
-			_elementViewHolder = new ElementViewHolder(content, linearLayout, bar, _selectedCallback);
+			_elementViewHolder = new ElementViewHolder(content, linearLayout, bar, _selectedCallback, NotifyItemChanged);
 
 			return _elementViewHolder;
 		}
@@ -234,6 +235,7 @@ namespace Xamarin.Forms.Platform.Android
 			grid.HeightRequest = 50;
 			grid.ColumnDefinitions.Add(new ColumnDefinition { Width = 54 });
 			grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Star });
+			grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
 			var image = new Image();
 			image.VerticalOptions = image.HorizontalOptions = LayoutOptions.Center;
@@ -250,6 +252,25 @@ namespace Xamarin.Forms.Platform.Android
 			label.FontSize = 14;
 			label.TextColor = Color.Black.MultiplyAlpha(0.87);
 			label.FontFamily = "sans-serif-medium";
+
+			var badgeLabel = new Label();
+			badgeLabel.SetBinding(Label.TextProperty, nameof(BaseShellItem.BadgeText));
+
+			Frame badgeFrame = new Frame();
+			badgeFrame.SetBinding(Frame.IsVisibleProperty, nameof(BaseShellItem.BadgeText), converter: new IsNotNullOrEmptyConverter());
+			badgeFrame.Margin = new Thickness(0, 0, 8, 0);
+			badgeFrame.SetBinding(Frame.BackgroundColorProperty, nameof(BaseShellItem.EffectiveBadgeColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.FromRgb(255, 59, 48)));
+			badgeFrame.CornerRadius = 10;
+			badgeFrame.HasShadow = false;
+			badgeFrame.Padding = new Thickness(6, 2);
+			badgeFrame.Content = badgeLabel;
+			badgeFrame.VerticalOptions = LayoutOptions.Center;
+			badgeFrame.HorizontalOptions = LayoutOptions.End;
+
+			grid.Children.Add(badgeFrame, 2, 0);
+
+			badgeLabel.FontSize = 10;
+			badgeLabel.SetBinding(Label.TextColorProperty, nameof(BaseShellItem.EffectiveBadgeTextColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.White));
 
 			return grid;
 		}
@@ -290,17 +311,20 @@ namespace Xamarin.Forms.Platform.Android
 		public class ElementViewHolder : RecyclerView.ViewHolder
 		{
 			Action<Element> _selectedCallback;
+			Action<int> _notifyItemChanged;
 			Element _element;
 			AView _itemView;
 			bool _disposed;
 
-			public ElementViewHolder(View view, AView itemView, AView bar, Action<Element> selectedCallback) : base(itemView)
+
+			public ElementViewHolder(View view, AView itemView, AView bar, Action<Element> selectedCallback, Action<int> notifyItemChanged) : base(itemView)
 			{
 				_itemView = itemView;
 				itemView.Click += OnClicked;
 				View = view;
 				Bar = bar;
 				_selectedCallback = selectedCallback;
+				_notifyItemChanged = notifyItemChanged;
 			}
 
 			public View View { get; }
@@ -346,6 +370,14 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				if (e.PropertyName == BaseShellItem.IsCheckedProperty.PropertyName)
 					UpdateVisualState();
+
+				if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
+					e.PropertyName == nameof(BaseShellItem.EffectiveBadgeTextColor) ||
+					e.PropertyName == nameof(BaseShellItem.EffectiveBadgeColor))
+				{
+					// This should not be needed, but somehow bounded properties do not refresh the view, _itemView.Invalidate() doesn't work either
+					_notifyItemChanged(AdapterPosition);
+				}
 			}
 
 			void OnClicked(object sender, EventArgs e)
@@ -374,6 +406,32 @@ namespace Xamarin.Forms.Platform.Android
 
 				base.Dispose(disposing);
 			}
+		}
+
+		public class IsNotNullOrEmptyConverter : IValueConverter
+		{
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				return !string.IsNullOrEmpty((string)value);
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+		}
+
+		public class UseFallbackColorIfDefaultColorConverter : IValueConverter
+		{
+			public Color FallbackColor { get; }
+
+			public UseFallbackColorIfDefaultColorConverter(Color fallbackColor)
+			{
+				FallbackColor = fallbackColor;
+			}
+
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+				((Color)value).IsDefault ? FallbackColor : (Color)value;
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+				=> throw new NotImplementedException();
 		}
 	}
 }

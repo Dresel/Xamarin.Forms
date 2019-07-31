@@ -13,7 +13,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
+using Android.Support.Design.Internal;
 using AColor = Android.Graphics.Color;
 using AView = Android.Views.View;
 using ColorStateList = Android.Content.Res.ColorStateList;
@@ -370,6 +372,27 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				SetupMenu();
 			}
+			else if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
+				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeColor) ||
+				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeTextColor) ||
+				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeMoreText))
+			{
+				var content = (ShellSection)sender;
+				var index = ShellItem.Items.IndexOf(content);
+
+				var itemCount = ShellItem.Items.Count;
+				var maxItems = _bottomView.MaxItemCount;
+
+				if (itemCount > maxItems && index > maxItems - 2)
+				{
+					ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxItems - 1).Any(x => x.IsChecked), MoreTabId);
+				}
+				else
+				{
+					var menuItem = _bottomView.Menu.FindItem(index);
+					ApplyBadge(content, content.BadgeText, content.IsChecked, menuItem.ItemId);
+				}
+			}
 		}
 
 		protected virtual void OnTabReselected(ShellSection shellSection)
@@ -391,6 +414,20 @@ namespace Xamarin.Forms.Platform.Android
 				_bottomView,
 				Context);
 
+			using (var bottomNavigationMenuView = (BottomNavigationMenuView)_bottomView.GetChildAt(0))
+			{
+				for (int i = 0; i < end; i++)
+				{
+					ShellSection shellSection = shellItem.Items[i];
+					ApplyBadge(shellSection, shellSection.BadgeText, shellSection.IsChecked, i);
+				}
+
+				if (showMore)
+				{
+					ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxBottomItems - 1).Any(x => x.IsChecked), MoreTabId);
+				}
+			}
+
 			UpdateTabBarVisibility();
 		}
 
@@ -399,6 +436,16 @@ namespace Xamarin.Forms.Platform.Android
 			bool tabEnabled = shellSection.IsEnabled;
 			if (menuItem.IsEnabled != tabEnabled)
 				menuItem.SetEnabled(tabEnabled);
+		}
+
+		protected virtual void ApplyBadge(BaseShellItem baseShellItem, string badgeText, bool isSelected, int itemId)
+		{
+			using (BottomNavigationMenuView bottomNavigationMenuView = ((BottomNavigationMenuView)_bottomView.GetChildAt(0)))
+			{
+				BottomNavigationItemView itemView = bottomNavigationMenuView.FindViewById<BottomNavigationItemView>(itemId);
+
+				itemView.ApplyBadge(baseShellItem.GetEffectiveBadgeColor(isSelected), badgeText, baseShellItem.GetEffectiveBadgeTextColor(isSelected));
+			}
 		}
 
 		void OnDisplayedElementPropertyChanged(object sender, PropertyChangedEventArgs e)

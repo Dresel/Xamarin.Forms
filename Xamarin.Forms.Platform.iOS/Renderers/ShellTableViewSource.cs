@@ -1,6 +1,7 @@
 ﻿using Foundation;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using UIKit;
 using Xamarin.Forms.Internals;
 
@@ -199,6 +200,25 @@ namespace Xamarin.Forms.Platform.iOS
 			label.FontSize = Device.GetNamedSize(NamedSize.Small, label);
 			label.FontAttributes = FontAttributes.Bold;
 
+			var badgeLabel = new Label();
+			badgeLabel.SetBinding(Label.TextProperty, nameof(BaseShellItem.BadgeText));
+
+			Frame badgeFrame = new Frame();
+			badgeFrame.SetBinding(Frame.IsVisibleProperty, nameof(BaseShellItem.BadgeText), converter: new IsNotNullOrEmptyConverter());
+			badgeFrame.Margin = new Thickness(0, 0, 8, 0);
+			badgeFrame.SetBinding(Frame.BackgroundColorProperty, nameof(BaseShellItem.EffectiveBadgeColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.FromRgb(255, 59, 48)));
+			badgeFrame.CornerRadius = 10;
+			badgeFrame.HasShadow = false;
+			badgeFrame.Padding = new Thickness(6, 2);
+			badgeFrame.Content = badgeLabel;
+			badgeFrame.VerticalOptions = LayoutOptions.Center;
+			badgeFrame.HorizontalOptions = LayoutOptions.End;
+
+			grid.Children.Add(badgeFrame, 2, 0);
+
+			badgeLabel.FontSize = 12;
+			badgeLabel.SetBinding(Label.TextColorProperty, nameof(BaseShellItem.EffectiveBadgeTextColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.White));
+
 			return grid;
 		}
 
@@ -223,6 +243,32 @@ namespace Xamarin.Forms.Platform.iOS
 				_line.Frame = new CoreGraphics.CGRect(15, 0, Frame.Width - 30, 1);
 				base.LayoutSubviews();
 			}
+		}
+
+		public class IsNotNullOrEmptyConverter : IValueConverter
+		{
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+			{
+				return !string.IsNullOrEmpty((string)value);
+			}
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+		}
+
+		public class UseFallbackColorIfDefaultColorConverter : IValueConverter
+		{
+			public Color FallbackColor { get; }
+
+			public UseFallbackColorIfDefaultColorConverter(Color fallbackColor)
+			{
+				FallbackColor = fallbackColor;
+			}
+
+			public object Convert(object value, Type targetType, object parameter, CultureInfo culture) =>
+				((Color)value).IsDefault ? FallbackColor : (Color)value;
+
+			public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+				=> throw new NotImplementedException();
 		}
 	}
 }
