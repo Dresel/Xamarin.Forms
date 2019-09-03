@@ -284,11 +284,11 @@ namespace Xamarin.Forms
 			shellSection.SetBinding(IconProperty, new Binding(nameof(Icon), BindingMode.OneWay, source: shellContent));
 			shellSection.SetBinding(FlyoutIconProperty, new Binding(nameof(FlyoutIcon), BindingMode.OneWay, source: shellContent));
 			shellSection.SetBinding(BadgeTextProperty, new Binding(nameof(BadgeText), BindingMode.OneWay, source: shellContent));
-			shellSection.SetBinding(Shell.BadgeMoreTextProperty, new Binding(nameof(BadgeMoreText), BindingMode.OneWay, source: shellContent));
-			shellSection.SetBinding(Shell.BadgeColorProperty, new Binding(nameof(BadgeColor), BindingMode.OneWay, source: shellContent));
-			shellSection.SetBinding(Shell.BadgeUnselectedColorProperty, new Binding(nameof(BadgeUnselectedColor), BindingMode.OneWay, source: shellContent));
-			shellSection.SetBinding(Shell.BadgeTextColorProperty, new Binding(nameof(BadgeTextColor), BindingMode.OneWay, source: shellContent));
-			shellSection.SetBinding(Shell.BadgeUnselectedTextColorProperty, new Binding(nameof(BadgeUnselectedTextColor), BindingMode.OneWay, source: shellContent));
+			shellSection.SetBinding(BadgeMoreTextProperty, new Binding(nameof(BadgeMoreText), BindingMode.OneWay, source: shellContent));
+			shellSection.SetBinding(BadgeColorProperty, new Binding(nameof(BadgeColor), BindingMode.OneWay, source: shellContent));
+			shellSection.SetBinding(BadgeUnselectedColorProperty, new Binding(nameof(BadgeUnselectedColor), BindingMode.OneWay, source: shellContent));
+			shellSection.SetBinding(BadgeTextColorProperty, new Binding(nameof(BadgeTextColor), BindingMode.OneWay, source: shellContent));
+			shellSection.SetBinding(BadgeUnselectedTextColorProperty, new Binding(nameof(BadgeUnselectedTextColor), BindingMode.OneWay, source: shellContent));
 
 			return shellSection;
 		}

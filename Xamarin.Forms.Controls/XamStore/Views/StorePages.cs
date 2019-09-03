@@ -330,10 +330,10 @@ namespace Xamarin.Forms.Controls.XamStore
 
 					shellSection.BadgeText = string.IsNullOrEmpty(shellSection.BadgeText) ? "99+" : string.Empty;
 
-					Shell.SetBadgeColor(shellSection, Color.DeepPink);
-					Shell.SetBadgeUnselectedColor(shellSection, Color.LightPink);
-					Shell.SetBadgeTextColor(shellSection, Color.Black);
-					Shell.SetBadgeUnselectedTextColor(shellSection, Color.LightGray);
+					shellSection.BadgeColor = Color.DeepPink;
+					shellSection.BadgeUnselectedColor = Color.LightPink;
+					shellSection.BadgeTextColor = Color.Black;
+					shellSection.BadgeUnselectedTextColor = Color.LightGray;
 				}), 2, 21);
 
 			grid.Children.Add(MakeButton("Badge1Top",
@@ -367,41 +367,101 @@ namespace Xamarin.Forms.Controls.XamStore
 
 					shellContent.BadgeText = string.IsNullOrEmpty(shellContent.BadgeText) ? "99+" : string.Empty;
 
-					Shell.SetBadgeColor(shellContent, Color.DeepSkyBlue);
-					Shell.SetBadgeUnselectedColor(shellContent, Color.LightSkyBlue);
-					Shell.SetBadgeTextColor(shellContent, Color.DarkRed);
-					Shell.SetBadgeUnselectedTextColor(shellContent, Color.LightCoral);
+					shellContent.BadgeColor = Color.DeepSkyBlue;
+					shellContent.BadgeUnselectedColor = Color.LightSkyBlue;
+					shellContent.BadgeTextColor = Color.DarkRed;
+					shellContent.BadgeUnselectedTextColor = Color.LightCoral;
 				}), 2, 22);
 
 			grid.Children.Add(MakeButton("MoreBadge",
 				() =>
 				{
 					ShellItem shellItem = Shell.Current.CurrentItem;
-					Shell.SetBadgeMoreText(shellItem, string.IsNullOrEmpty(Shell.GetBadgeMoreText(shellItem)) ? "!" : string.Empty);
+					shellItem.BadgeMoreText = string.IsNullOrEmpty(shellItem.BadgeMoreText) ? "!" : string.Empty;
 				}), 0, 23);
 
 			grid.Children.Add(MakeButton("BadgeColor",
 				() =>
 				{
-					Shell.SetBadgeColor(Shell.Current, Shell.GetBadgeColor(Shell.Current).IsDefault ? Color.DarkOrange : Color.Default);
+					// How should it be possible for a user to set or unset a default badge property for all badges at runtime?
+
+					IEnumerable<BaseShellItem> baseShellItems = Shell.Current.Items.Cast<BaseShellItem>()
+						.Concat(Shell.Current.Items.SelectMany(shellItem => shellItem.Items))
+						.Concat(Shell.Current.Items.SelectMany(shellItem => shellItem.Items)
+							.SelectMany(shellSection => shellSection.Items));
+
+					foreach (BaseShellItem baseShellItem in baseShellItems)
+					{
+						// This does override an already set value, so it's not really behaving like a default value
+						baseShellItem.BadgeColor =
+							baseShellItem.BadgeColor.IsDefault ? Color.DarkOrange : Color.Default;
+					}
+
+					// The following code was relying on attached properties with propagation
+					//Shell.SetBadgeColor(Shell.Current, Shell.GetBadgeColor(Shell.Current).IsDefault ? Color.DarkOrange : Color.Default);
 				}), 1, 23);
 
 			grid.Children.Add(MakeButton("BadgeTextColor",
 				() =>
 				{
-					Shell.SetBadgeTextColor(Shell.Current, Shell.GetBadgeTextColor(Shell.Current).IsDefault ? Color.Black : Color.Default);
+					// How should it be possible for a user to set or unset a default badge property for all badges at runtime?
+
+					IEnumerable<BaseShellItem> baseShellItems = Shell.Current.Items.Cast<BaseShellItem>()
+						.Concat(Shell.Current.Items.SelectMany(shellItem => shellItem.Items))
+						.Concat(Shell.Current.Items.SelectMany(shellItem => shellItem.Items)
+							.SelectMany(shellSection => shellSection.Items));
+
+					foreach (BaseShellItem baseShellItem in baseShellItems)
+					{
+						// This does override an already set value, so it's not really behaving like a default value
+						baseShellItem.BadgeTextColor =
+							baseShellItem.BadgeTextColor.IsDefault ? Color.Black : Color.Default;
+					}
+
+					// The following code was relying on attached properties with propagation
+					//Shell.SetBadgeTextColor(Shell.Current, Shell.GetBadgeTextColor(Shell.Current).IsDefault ? Color.Black : Color.Default);
 				}), 2, 23);
 
 			grid.Children.Add(MakeButton("BadgeUnselectedColor",
 				() =>
 				{
-					Shell.SetBadgeUnselectedColor(Shell.Current, Shell.GetBadgeUnselectedColor(Shell.Current).IsDefault ? Color.LightYellow : Color.Default);
+					// How should it be possible for a user to set or unset a default badge property for all badges at runtime?
+
+					IEnumerable<BaseShellItem> baseShellItems = Shell.Current.Items.Cast<BaseShellItem>()
+						.Concat(Shell.Current.Items.SelectMany(shellItem => shellItem.Items))
+						.Concat(Shell.Current.Items.SelectMany(shellItem => shellItem.Items)
+							.SelectMany(shellSection => shellSection.Items));
+
+					foreach (BaseShellItem baseShellItem in baseShellItems)
+					{
+						// This does override an already set value, so it's not really behaving like a default value
+						baseShellItem.BadgeUnselectedColor =
+							baseShellItem.BadgeUnselectedColor.IsDefault ? Color.LightYellow : Color.Default;
+					}
+
+					// The following code was relying on attached properties with propagation
+					//Shell.SetBadgeUnselectedColor(Shell.Current, Shell.GetBadgeUnselectedColor(Shell.Current).IsDefault ? Color.LightYellow : Color.Default);
 				}), 0, 24);
 
 			grid.Children.Add(MakeButton("BadgeUnselectedTextColor",
 				() =>
 				{
-					Shell.SetBadgeUnselectedTextColor(Shell.Current, Shell.GetBadgeUnselectedTextColor(Shell.Current).IsDefault ? Color.Gainsboro : Color.Default);
+					// How should it be possible for a user to set or unset a default badge property for all badges at runtime?
+
+					IEnumerable<BaseShellItem> baseShellItems = Shell.Current.Items.Cast<BaseShellItem>()
+						.Concat(Shell.Current.Items.SelectMany(shellItem => shellItem.Items))
+						.Concat(Shell.Current.Items.SelectMany(shellItem => shellItem.Items)
+							.SelectMany(shellSection => shellSection.Items));
+
+					foreach (BaseShellItem baseShellItem in baseShellItems)
+					{
+						// This does override an already set value, so it's not really behaving like a default value
+						baseShellItem.BadgeUnselectedTextColor =
+							baseShellItem.BadgeUnselectedTextColor.IsDefault ? Color.Gainsboro : Color.Default;
+					}
+
+					// The following code was relying on attached properties with propagation
+					//Shell.SetBadgeUnselectedTextColor(Shell.Current, Shell.GetBadgeUnselectedTextColor(Shell.Current).IsDefault ? Color.Gainsboro : Color.Default);
 				}), 1, 24);
 
 			Content = new ScrollView { Content = grid };

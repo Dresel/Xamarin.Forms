@@ -329,8 +329,11 @@ namespace Xamarin.Forms.Platform.Android
 		void OnShellContentPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeTextColor) ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeColor))
+				e.PropertyName == BaseShellItem.BadgeColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeTextColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeUnselectedColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeUnselectedTextColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.IsCheckedProperty.PropertyName)
 			{
 				ApplyBadge((ShellContent)sender);
 			}

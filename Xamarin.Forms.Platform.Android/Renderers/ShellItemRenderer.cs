@@ -349,6 +349,22 @@ namespace Xamarin.Forms.Platform.Android
 			SetupMenu();
 		}
 
+		protected override void OnShellItemPropertyChanged(object sender, PropertyChangedEventArgs e)
+		{
+			base.OnShellItemPropertyChanged(sender, e);
+
+			if (e.PropertyName == BaseShellItem.BadgeMoreTextProperty.PropertyName)
+			{
+				var itemCount = ShellItem.Items.Count;
+				var maxItems = _bottomView.MaxItemCount;
+
+				if (itemCount > maxItems)
+				{
+					ApplyBadge(ShellItem, ShellItem.BadgeMoreText, ShellItem.Items.Skip(maxItems - 1).Any(x => x.IsChecked), MoreTabId);
+				}
+			}
+		}
+
 		protected override void OnShellSectionPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			base.OnShellSectionPropertyChanged(sender, e);
@@ -373,9 +389,11 @@ namespace Xamarin.Forms.Platform.Android
 				SetupMenu();
 			}
 			else if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeColor) ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeTextColor) ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeMoreText))
+				e.PropertyName == BaseShellItem.BadgeColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeTextColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeUnselectedColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeUnselectedTextColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.IsCheckedProperty.PropertyName)
 			{
 				var content = (ShellSection)sender;
 				var index = ShellItem.Items.IndexOf(content);
@@ -385,7 +403,7 @@ namespace Xamarin.Forms.Platform.Android
 
 				if (itemCount > maxItems && index > maxItems - 2)
 				{
-					ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxItems - 1).Any(x => x.IsChecked), MoreTabId);
+					ApplyBadge(ShellItem, ShellItem.BadgeMoreText, ShellItem.Items.Skip(maxItems - 1).Any(x => x.IsChecked), MoreTabId);
 				}
 				else
 				{
@@ -424,7 +442,7 @@ namespace Xamarin.Forms.Platform.Android
 
 				if (showMore)
 				{
-					ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxBottomItems - 1).Any(x => x.IsChecked), MoreTabId);
+					ApplyBadge(ShellItem, ShellItem.BadgeMoreText, ShellItem.Items.Skip(maxBottomItems - 1).Any(x => x.IsChecked), MoreTabId);
 				}
 			}
 

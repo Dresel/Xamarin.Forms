@@ -372,8 +372,11 @@ namespace Xamarin.Forms.Platform.Android
 					UpdateVisualState();
 
 				if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
-					e.PropertyName == nameof(BaseShellItem.EffectiveBadgeTextColor) ||
-					e.PropertyName == nameof(BaseShellItem.EffectiveBadgeColor))
+					e.PropertyName == BaseShellItem.BadgeColorProperty.PropertyName ||
+					e.PropertyName == BaseShellItem.BadgeTextColorProperty.PropertyName ||
+					e.PropertyName == BaseShellItem.BadgeUnselectedColorProperty.PropertyName ||
+					e.PropertyName == BaseShellItem.BadgeUnselectedTextColorProperty.PropertyName ||
+					e.PropertyName == BaseShellItem.IsCheckedProperty.PropertyName)
 				{
 					// This should not be needed, but somehow bounded properties do not refresh the view, _itemView.Invalidate() doesn't work either
 					_notifyItemChanged(AdapterPosition);
