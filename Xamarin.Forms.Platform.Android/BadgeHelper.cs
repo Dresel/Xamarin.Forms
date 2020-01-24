@@ -4,12 +4,17 @@ using Android.Content;
 using Android.Graphics.Drawables;
 using Android.Graphics.Drawables.Shapes;
 using Android.Runtime;
-using Android.Support.Design.Internal;
-using Android.Support.Design.Widget;
 using Android.Util;
 using Android.Views;
 using Android.Widget;
 using LP = Android.Views.ViewGroup.LayoutParams;
+#if __ANDROID_29__
+using Google.Android.Material.BottomNavigation;
+using Google.Android.Material.Tabs;
+#else
+using Android.Support.Design.Internal;
+using Android.Support.Design.Widget;
+#endif
 
 namespace Xamarin.Forms.Platform.Android
 {

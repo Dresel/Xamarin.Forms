@@ -6,6 +6,7 @@ using Google.Android.Material.BottomNavigation;
 using Google.Android.Material.BottomSheet;
 #else
 using Android.Support.Design.Widget;
+using Android.Support.Design.Internal;
 #endif
 using Android.Views;
 using Android.Widget;
@@ -15,7 +16,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
-using Android.Support.Design.Internal;
 using AColor = Android.Graphics.Color;
 using AView = Android.Views.View;
 using ColorStateList = Android.Content.Res.ColorStateList;
@@ -432,21 +432,28 @@ namespace Xamarin.Forms.Platform.Android
 				_bottomView,
 				Context);
 
-			using (var bottomNavigationMenuView = (BottomNavigationMenuView)_bottomView.GetChildAt(0))
-			{
-				for (int i = 0; i < end; i++)
-				{
-					ShellSection shellSection = shellItem.Items[i];
-					ApplyBadge(shellSection, shellSection.BadgeText, shellSection.IsChecked, i);
-				}
-
-				if (showMore)
-				{
-					ApplyBadge(ShellItem, ShellItem.BadgeMoreText, ShellItem.Items.Skip(maxBottomItems - 1).Any(x => x.IsChecked), MoreTabId);
-				}
-			}
+			SetupBadges(shellItem, maxBottomItems, items);
 
 			UpdateTabBarVisibility();
+		}
+
+		protected void SetupBadges(ShellItem shellItem, int maxBottomItems, List<(string title, ImageSource icon, bool tabEnabled)> items)
+		{
+			int numberOfMenuItems = items.Count;
+			bool showMore = numberOfMenuItems > maxBottomItems;
+			int end = showMore ? maxBottomItems - 1 : numberOfMenuItems;
+
+			for (int i = 0; i < end; i++)
+			{
+				ShellSection shellSection = shellItem.Items[i];
+				ApplyBadge(shellSection, shellSection.BadgeText, shellSection.IsChecked, i);
+			}
+
+			if (showMore)
+			{
+				ApplyBadge(ShellItem, ShellItem.BadgeMoreText,
+					ShellItem.Items.Skip(maxBottomItems - 1).Any(x => x.IsChecked), MoreTabId);
+			}
 		}
 
 		protected virtual void UpdateShellSectionEnabled(ShellSection shellSection, IMenuItem menuItem)

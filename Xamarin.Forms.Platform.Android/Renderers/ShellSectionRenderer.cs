@@ -294,7 +294,7 @@ namespace Xamarin.Forms.Platform.Android
 
 		void HookEvents()
 		{
-			SectionController.ItemsCollectionChanged += OnItemsCollectionChagned;
+			SectionController.ItemsCollectionChanged += OnItemsCollectionChanged;
 			((IShellController)_shellContext.Shell).AddAppearanceObserver(this, ShellSection);
 			ShellSection.PropertyChanged += OnShellItemPropertyChanged;
 
@@ -316,7 +316,7 @@ namespace Xamarin.Forms.Platform.Android
 				UnhookChildEvents(shellContent);
 			}
 
-			SectionController.ItemsCollectionChanged -= OnItemsCollectionChagned;
+			SectionController.ItemsCollectionChanged -= OnItemsCollectionChanged;
 			((IShellController)_shellContext?.Shell)?.RemoveAppearanceObserver(this);
 			ShellSection.PropertyChanged -= OnShellItemPropertyChanged;
 		}

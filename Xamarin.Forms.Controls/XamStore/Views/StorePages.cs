@@ -300,12 +300,22 @@ namespace Xamarin.Forms.Controls.XamStore
 			grid.Children.Add(new Label() { Text = "FH Top Margin" }, 0, 20);
 			grid.Children.Add(flyheaderMargin, 1, 20);
 
+			grid.Children.Add(MakeButton("Hide Nav Shadow",
+					() => Shell.SetNavBarHasShadow(this, false)),
+				1, 21);
+
+			grid.Children.Add(MakeButton("Show Nav Shadow",
+					() => Shell.SetNavBarHasShadow(this, true)),
+				2, 21);
+
+			grid.Children.Add(new Label() { Text = "Badges" }, 0, 22);
+
 			grid.Children.Add(MakeButton("Badge1",
 				() =>
 				{
 					var shellSection = Shell.Current.CurrentItem.Items.First();
 					shellSection.BadgeText = string.IsNullOrEmpty(shellSection.BadgeText) ? "1" : string.Empty;
-				}), 0, 21);
+				}), 0, 23);
 
 			grid.Children.Add(MakeButton("Badge1++",
 				() =>
@@ -320,7 +330,7 @@ namespace Xamarin.Forms.Controls.XamStore
 					{
 						shellSection.BadgeText = "1";
 					}
-				}), 1, 21);
+				}), 1, 23);
 
 			grid.Children.Add(MakeButton("Badge2",
 				() =>
@@ -334,14 +344,14 @@ namespace Xamarin.Forms.Controls.XamStore
 					shellSection.BadgeUnselectedColor = Color.LightPink;
 					shellSection.BadgeTextColor = Color.Black;
 					shellSection.BadgeUnselectedTextColor = Color.LightGray;
-				}), 2, 21);
+				}), 2, 23);
 
 			grid.Children.Add(MakeButton("Badge1Top",
 				() =>
 				{
 					var shellContent = Shell.Current.CurrentItem.CurrentItem.Items.First();
 					shellContent.BadgeText = string.IsNullOrEmpty(shellContent.BadgeText) ? "1" : string.Empty;
-				}), 0, 22);
+				}), 0, 24);
 
 			grid.Children.Add(MakeButton("Badge1Top++",
 				() =>
@@ -356,7 +366,7 @@ namespace Xamarin.Forms.Controls.XamStore
 					{
 						shellSection.BadgeText = "1";
 					}
-				}), 1, 22);
+				}), 1, 24);
 
 			grid.Children.Add(MakeButton("Badge2Top",
 				() =>
@@ -371,14 +381,14 @@ namespace Xamarin.Forms.Controls.XamStore
 					shellContent.BadgeUnselectedColor = Color.LightSkyBlue;
 					shellContent.BadgeTextColor = Color.DarkRed;
 					shellContent.BadgeUnselectedTextColor = Color.LightCoral;
-				}), 2, 22);
+				}), 2, 24);
 
 			grid.Children.Add(MakeButton("MoreBadge",
 				() =>
 				{
 					ShellItem shellItem = Shell.Current.CurrentItem;
 					shellItem.BadgeMoreText = string.IsNullOrEmpty(shellItem.BadgeMoreText) ? "!" : string.Empty;
-				}), 0, 23);
+				}), 0, 25);
 
 			grid.Children.Add(MakeButton("BadgeColor",
 				() =>
@@ -399,7 +409,7 @@ namespace Xamarin.Forms.Controls.XamStore
 
 					// The following code was relying on attached properties with propagation
 					//Shell.SetBadgeColor(Shell.Current, Shell.GetBadgeColor(Shell.Current).IsDefault ? Color.DarkOrange : Color.Default);
-				}), 1, 23);
+				}), 1, 25);
 
 			grid.Children.Add(MakeButton("BadgeTextColor",
 				() =>
@@ -420,7 +430,7 @@ namespace Xamarin.Forms.Controls.XamStore
 
 					// The following code was relying on attached properties with propagation
 					//Shell.SetBadgeTextColor(Shell.Current, Shell.GetBadgeTextColor(Shell.Current).IsDefault ? Color.Black : Color.Default);
-				}), 2, 23);
+				}), 2, 25);
 
 			grid.Children.Add(MakeButton("BadgeUnselectedColor",
 				() =>
@@ -441,7 +451,7 @@ namespace Xamarin.Forms.Controls.XamStore
 
 					// The following code was relying on attached properties with propagation
 					//Shell.SetBadgeUnselectedColor(Shell.Current, Shell.GetBadgeUnselectedColor(Shell.Current).IsDefault ? Color.LightYellow : Color.Default);
-				}), 0, 24);
+				}), 0, 26);
 
 			grid.Children.Add(MakeButton("BadgeUnselectedTextColor",
 				() =>
@@ -462,19 +472,10 @@ namespace Xamarin.Forms.Controls.XamStore
 
 					// The following code was relying on attached properties with propagation
 					//Shell.SetBadgeUnselectedTextColor(Shell.Current, Shell.GetBadgeUnselectedTextColor(Shell.Current).IsDefault ? Color.Gainsboro : Color.Default);
-				}), 1, 24);
+				}), 1, 26);
 
 			Content = new ScrollView { Content = grid };
-
-
-            grid.Children.Add(MakeButton("Hide Nav Shadow",
-                    () => Shell.SetNavBarHasShadow(this, false)),
-                1, 21);
-
-            grid.Children.Add(MakeButton("Show Nav Shadow",
-                    () => Shell.SetNavBarHasShadow(this, true)),
-                2, 21);
-        }
+		}
 
 		Switch _navBarVisibleSwitch;
 		Switch _tabBarVisibleSwitch;
