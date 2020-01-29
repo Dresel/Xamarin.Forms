@@ -245,8 +245,8 @@ namespace Xamarin.Forms.Platform.iOS
 				TabBar.Items[index].Enabled = shellSection.IsEnabled;
 			}
 			else if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeColor) ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeTextColor) ||
+				e.PropertyName == nameof(BaseShellItem.BadgeEffectiveColor) ||
+				e.PropertyName == nameof(BaseShellItem.BadgeEffectiveTextColor) ||
 				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeMoreText))
 			{
 				var shellSection = (ShellSection)sender;
@@ -444,12 +444,12 @@ namespace Xamarin.Forms.Platform.iOS
 		void ApplyBadge(BaseShellItem baseShellItem, string badgeText, bool isSelected, UITabBarItem tabBarItem)
 		{
 			tabBarItem.BadgeValue = !string.IsNullOrEmpty(badgeText) ? badgeText : null;
-			var badgeColor = baseShellItem.GetEffectiveBadgeColor(isSelected);
+			var badgeColor = baseShellItem.GetBadgeEffectiveColor(isSelected);
 			tabBarItem.BadgeColor = !badgeColor.IsDefault ? badgeColor.ToUIColor() : null;
 
 			var stringAttributes = new UIStringAttributes();
 
-			var badgeTextColor = baseShellItem.GetEffectiveBadgeTextColor(isSelected);
+			var badgeTextColor = baseShellItem.GetBadgeEffectiveTextColor(isSelected);
 
 			if (!badgeTextColor.IsDefault)
 			{

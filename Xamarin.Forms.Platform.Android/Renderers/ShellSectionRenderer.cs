@@ -352,7 +352,7 @@ namespace Xamarin.Forms.Platform.Android
 			var indexOf = this.ShellSection.Items.IndexOf(shellContent);
 			var tabView = (TabLayout.TabView)((ViewGroup)_tablayout.GetChildAt(0)).GetChildAt(indexOf);
 
-			tabView.ApplyBadge(shellContent.EffectiveBadgeColor, shellContent.BadgeText, shellContent.EffectiveBadgeTextColor);
+			tabView.ApplyBadge(shellContent.BadgeEffectiveColor, shellContent.BadgeText, shellContent.BadgeEffectiveTextColor);
 		}
 	}
 }

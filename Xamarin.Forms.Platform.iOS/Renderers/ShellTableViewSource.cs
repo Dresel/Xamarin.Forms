@@ -206,7 +206,7 @@ namespace Xamarin.Forms.Platform.iOS
 			Frame badgeFrame = new Frame();
 			badgeFrame.SetBinding(Frame.IsVisibleProperty, nameof(BaseShellItem.BadgeText), converter: new IsNotNullOrEmptyConverter());
 			badgeFrame.Margin = new Thickness(0, 0, 8, 0);
-			badgeFrame.SetBinding(Frame.BackgroundColorProperty, nameof(BaseShellItem.EffectiveBadgeColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.FromRgb(255, 59, 48)));
+			badgeFrame.SetBinding(Frame.BackgroundColorProperty, nameof(BaseShellItem.BadgeEffectiveColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.FromRgb(255, 59, 48)));
 			badgeFrame.CornerRadius = 10;
 			badgeFrame.HasShadow = false;
 			badgeFrame.Padding = new Thickness(6, 2);
@@ -217,7 +217,7 @@ namespace Xamarin.Forms.Platform.iOS
 			grid.Children.Add(badgeFrame, 2, 0);
 
 			badgeLabel.FontSize = 12;
-			badgeLabel.SetBinding(Label.TextColorProperty, nameof(BaseShellItem.EffectiveBadgeTextColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.White));
+			badgeLabel.SetBinding(Label.TextColorProperty, nameof(BaseShellItem.BadgeEffectiveTextColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.White));
 
 			return grid;
 		}

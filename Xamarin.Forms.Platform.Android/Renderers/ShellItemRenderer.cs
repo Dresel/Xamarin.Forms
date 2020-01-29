@@ -469,7 +469,7 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				BottomNavigationItemView itemView = bottomNavigationMenuView.FindViewById<BottomNavigationItemView>(itemId);
 
-				itemView.ApplyBadge(baseShellItem.GetEffectiveBadgeColor(isSelected), badgeText, baseShellItem.GetEffectiveBadgeTextColor(isSelected));
+				itemView.ApplyBadge(baseShellItem.GetBadgeEffectiveColor(isSelected), badgeText, baseShellItem.GetBadgeEffectiveTextColor(isSelected));
 			}
 		}
 

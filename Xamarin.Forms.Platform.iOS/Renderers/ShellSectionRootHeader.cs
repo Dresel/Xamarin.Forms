@@ -99,7 +99,7 @@ namespace Xamarin.Forms.Platform.iOS
 			else
 				headerCell.Selected = false;
 
-			headerCell.ApplyBadge(shellContent.EffectiveBadgeColor, shellContent.BadgeText, shellContent.EffectiveBadgeTextColor);
+			headerCell.ApplyBadge(shellContent.BadgeEffectiveColor, shellContent.BadgeText, shellContent.BadgeEffectiveTextColor);
 			_shellContentToCellMapping[shellContent] = headerCell;
 
 			return headerCell;
@@ -299,12 +299,12 @@ namespace Xamarin.Forms.Platform.iOS
 		void OnShellContentPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeColor) ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeTextColor))
+				e.PropertyName == nameof(BaseShellItem.BadgeEffectiveColor) ||
+				e.PropertyName == nameof(BaseShellItem.BadgeEffectiveTextColor))
 			{
 				var shellContent = (ShellContent)sender;
 				var headerCell = _shellContentToCellMapping[shellContent];
-				headerCell.ApplyBadge(shellContent.EffectiveBadgeColor, shellContent.BadgeText, shellContent.EffectiveBadgeTextColor);
+				headerCell.ApplyBadge(shellContent.BadgeEffectiveColor, shellContent.BadgeText, shellContent.BadgeEffectiveTextColor);
 				headerCell.SetNeedsLayout();
 			}
 		}

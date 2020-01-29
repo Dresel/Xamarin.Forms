@@ -174,7 +174,7 @@ namespace Xamarin.Forms.Platform.Android
 			container.LayoutParameters = new LP(LP.MatchParent, LP.WrapContent);
 			linearLayout.AddView(container);
 
-			_elementViewHolder = new ElementViewHolder(content, linearLayout, bar, _selectedCallback, NotifyItemChanged);
+			_elementViewHolder = new ElementViewHolder(content, linearLayout, bar, _selectedCallback);
 
 			return _elementViewHolder;
 		}
@@ -257,9 +257,9 @@ namespace Xamarin.Forms.Platform.Android
 			badgeLabel.SetBinding(Label.TextProperty, nameof(BaseShellItem.BadgeText));
 
 			Frame badgeFrame = new Frame();
-			badgeFrame.SetBinding(Frame.IsVisibleProperty, nameof(BaseShellItem.BadgeText), converter: new IsNotNullOrEmptyConverter());
+			badgeFrame.SetBinding(Frame.IsVisibleProperty, BaseShellItem.BadgeTextProperty.PropertyName, converter: new IsNotNullOrEmptyConverter());
 			badgeFrame.Margin = new Thickness(0, 0, 8, 0);
-			badgeFrame.SetBinding(Frame.BackgroundColorProperty, nameof(BaseShellItem.EffectiveBadgeColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.FromRgb(255, 59, 48)));
+			badgeFrame.SetBinding(Frame.BackgroundColorProperty, BaseShellItem.BadgeEffectiveColorProperty.PropertyName, converter: new UseFallbackColorIfDefaultColorConverter(Color.FromRgb(255, 59, 48)));
 			badgeFrame.CornerRadius = 10;
 			badgeFrame.HasShadow = false;
 			badgeFrame.Padding = new Thickness(6, 2);
@@ -270,7 +270,7 @@ namespace Xamarin.Forms.Platform.Android
 			grid.Children.Add(badgeFrame, 2, 0);
 
 			badgeLabel.FontSize = 10;
-			badgeLabel.SetBinding(Label.TextColorProperty, nameof(BaseShellItem.EffectiveBadgeTextColor), converter: new UseFallbackColorIfDefaultColorConverter(Color.White));
+			badgeLabel.SetBinding(Label.TextColorProperty, BaseShellItem.BadgeEffectiveTextColorProperty.PropertyName, converter: new UseFallbackColorIfDefaultColorConverter(Color.White));
 
 			return grid;
 		}
@@ -311,20 +311,18 @@ namespace Xamarin.Forms.Platform.Android
 		public class ElementViewHolder : RecyclerView.ViewHolder
 		{
 			Action<Element> _selectedCallback;
-			Action<int> _notifyItemChanged;
 			Element _element;
 			AView _itemView;
 			bool _disposed;
 
 
-			public ElementViewHolder(View view, AView itemView, AView bar, Action<Element> selectedCallback, Action<int> notifyItemChanged) : base(itemView)
+			public ElementViewHolder(View view, AView itemView, AView bar, Action<Element> selectedCallback) : base(itemView)
 			{
 				_itemView = itemView;
 				itemView.Click += OnClicked;
 				View = view;
 				Bar = bar;
 				_selectedCallback = selectedCallback;
-				_notifyItemChanged = notifyItemChanged;
 			}
 
 			public View View { get; }
@@ -369,17 +367,8 @@ namespace Xamarin.Forms.Platform.Android
 			void OnElementPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
 			{
 				if (e.PropertyName == BaseShellItem.IsCheckedProperty.PropertyName)
-					UpdateVisualState();
-
-				if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
-					e.PropertyName == BaseShellItem.BadgeColorProperty.PropertyName ||
-					e.PropertyName == BaseShellItem.BadgeTextColorProperty.PropertyName ||
-					e.PropertyName == BaseShellItem.BadgeUnselectedColorProperty.PropertyName ||
-					e.PropertyName == BaseShellItem.BadgeUnselectedTextColorProperty.PropertyName ||
-					e.PropertyName == BaseShellItem.IsCheckedProperty.PropertyName)
 				{
-					// This should not be needed, but somehow bounded properties do not refresh the view, _itemView.Invalidate() doesn't work either
-					_notifyItemChanged(AdapterPosition);
+					UpdateVisualState();
 				}
 			}
 

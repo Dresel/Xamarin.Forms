@@ -64,11 +64,17 @@ namespace Xamarin.Forms
 		public static readonly BindableProperty BadgeUnselectedTextColorProperty =
 			BindableProperty.Create(nameof(BadgeUnselectedTextColor), typeof(Color), typeof(BaseShellItem), Color.Default, BindingMode.OneWay);
 
+		public static readonly BindableProperty BadgeEffectiveTextColorProperty =
+			BindableProperty.CreateReadOnly(nameof(BadgeEffectiveTextColor), typeof(Color), typeof(BaseShellItem), Color.Default, BindingMode.OneWay).BindableProperty;
+
 		public static readonly BindableProperty BadgeColorProperty =
 			BindableProperty.Create(nameof(BadgeColor), typeof(Color), typeof(BaseShellItem), Color.Default, BindingMode.OneWay);
 
 		public static readonly BindableProperty BadgeUnselectedColorProperty =
 			BindableProperty.Create(nameof(BadgeUnselectedColor), typeof(Color), typeof(BaseShellItem), Color.Default, BindingMode.OneWay);
+
+		public static readonly BindableProperty BadgeEffectiveColorProperty =
+			BindableProperty.CreateReadOnly(nameof(BadgeEffectiveColor), typeof(Color), typeof(BaseShellItem), Color.Default, BindingMode.OneWay).BindableProperty;
 
 		static void OnTabIndexPropertyChanged(BindableObject bindable, object oldValue, object newValue) =>
 			((BaseShellItem)bindable).OnTabIndexPropertyChanged((int)oldValue, (int)newValue);
@@ -166,9 +172,9 @@ namespace Xamarin.Forms
 			set { SetValue(BadgeUnselectedColorProperty, value); }
 		}
 
-		public Color EffectiveBadgeTextColor => GetEffectiveBadgeTextColor(IsChecked);
+		public Color BadgeEffectiveTextColor => GetBadgeEffectiveTextColor(IsChecked);
 
-		public Color GetEffectiveBadgeTextColor(bool isSelected)
+		public Color GetBadgeEffectiveTextColor(bool isSelected)
 		{
 			if (isSelected)
 			{
@@ -178,9 +184,9 @@ namespace Xamarin.Forms
 			return !BadgeUnselectedTextColor.IsDefault ? BadgeUnselectedTextColor : BadgeTextColor;
 		}
 
-		public Color EffectiveBadgeColor => GetEffectiveBadgeColor(IsChecked);
+		public Color BadgeEffectiveColor => GetBadgeEffectiveColor(IsChecked);
 
-		public Color GetEffectiveBadgeColor(bool isSelected)
+		public Color GetBadgeEffectiveColor(bool isSelected)
 		{
 			if (isSelected)
 			{
@@ -266,6 +272,17 @@ namespace Xamarin.Forms
 		protected override void OnPropertyChanged([CallerMemberName] string propertyName = null)
 		{
 			base.OnPropertyChanged(propertyName);
+
+			if (propertyName == BadgeTextColorProperty.PropertyName || propertyName == BadgeUnselectedTextColorProperty.PropertyName || propertyName == IsCheckedProperty.PropertyName)
+			{
+				OnPropertyChanged(BadgeEffectiveTextColorProperty.PropertyName);
+			}
+
+			if (propertyName == BadgeColorProperty.PropertyName || propertyName == BadgeUnselectedColorProperty.PropertyName || propertyName == IsCheckedProperty.PropertyName)
+			{
+				OnPropertyChanged(BadgeEffectiveColorProperty.PropertyName);
+			}
+
 			if (Parent != null)
 			{
 				if (propertyName == Shell.ItemTemplateProperty.PropertyName || propertyName == nameof(Parent))
