@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using Xamarin.Forms.CustomAttributes;
 using Xamarin.Forms.Internals;
 #if UITEST
@@ -28,19 +29,31 @@ namespace Xamarin.Forms.Controls.Issues
 
 		const string SetContentBadgeTextColor = "CBTC";
 
+		const string SetContentBadgeUnselectedTextColor = "CBUTC";
+
 		const string SetContentBadgeColor = "CBC";
+
+		const string SetContentBadgeUnselectedColor = "CBUC";
 
 		const string SetSectionBadgeText = "SBT";
 
 		const string SetSectionBadgeTextColor = "SBTC";
 
+		const string SetSectionBadgeUnselectedTextColor = "SBUTC";
+
 		const string SetSectionBadgeColor = "SBC";
+
+		const string SetSectionBadgeUnselectedColor = "SBUC";
 
 		const string SetItemBadgeText = "IBT";
 
 		const string SetItemBadgeTextColor = "IBTC";
 
+		const string SetItemBadgeUnselectedTextColor = "IBUTC";
+
 		const string SetItemBadgeColor = "IBC";
+
+		const string SetItemBadgeUnselectedColor = "IBUC";
 
 #if __ANDROID__
 		protected int TextColorDefault = -1;
@@ -48,11 +61,17 @@ namespace Xamarin.Forms.Controls.Issues
 		// Color.DarkBlue.ToAndroid().ToArgb();
 		protected int TextColorSet = -16777077;
 
+		// Color.DarkGreen.ToAndroid().ToArgb();
+		protected int UnselectedTextColorSet = -16751616;
+
 		// Color.FromRgb(255, 59, 48).ToAndroid().ToArgb();
 		protected int BadgeColorDefault = -50384;
 
 		// Color.DarkOrange.ToAndroid().ToArgb()
 		protected int BadgeColorSet = -29696;
+
+		// Color.DarkMagenta.ToAndroid().ToArgb();
+		protected int UnselectedColorSet = -7667573;
 #endif
 
 		// Test implicit ShellItem, ShellSection
@@ -110,9 +129,9 @@ namespace Xamarin.Forms.Controls.Issues
 								Orientation = StackOrientation.Horizontal,
 								Children =
 								{
-									CreateBadgeButton(SetContentBadgeText, (contentViewModel, sectionViewModel, itemViewModel) => { contentViewModel.Text = "2"; }),
-									CreateBadgeButton(SetContentBadgeTextColor, (contentViewModel, sectionViewModel, itemViewModel) => { contentViewModel.TextColor = Color.DarkBlue; }),
-									CreateBadgeButton(SetContentBadgeColor, (contentViewModel, sectionViewModel, itemViewModel) => { contentViewModel.Color = Color.DarkOrange; }),
+									CreateBadgeButton(SetContentBadgeText, () => { Shell.Current.ShellContentBadgeViewModel("Content 111").Text = "2"; }),
+									CreateBadgeButton(SetContentBadgeTextColor, () => { Shell.Current.ShellContentBadgeViewModel("Content 111").TextColor = Color.DarkBlue; }),
+									CreateBadgeButton(SetContentBadgeColor, () => { Shell.Current.ShellContentBadgeViewModel("Content 111").Color = Color.DarkOrange; }),
 								}
 							},
 							new StackLayout
@@ -120,9 +139,18 @@ namespace Xamarin.Forms.Controls.Issues
 								Orientation = StackOrientation.Horizontal,
 								Children =
 								{
-									CreateBadgeButton(SetSectionBadgeText, (contentViewModel, sectionViewModel, itemViewModel) => { sectionViewModel.Text = "2"; }),
-									CreateBadgeButton(SetSectionBadgeTextColor, (contentViewModel, sectionViewModel, itemViewModel) => { sectionViewModel.TextColor = Color.DarkBlue; }),
-									CreateBadgeButton(SetSectionBadgeColor, (contentViewModel, sectionViewModel, itemViewModel) => { sectionViewModel.Color = Color.DarkOrange; }),
+									CreateBadgeButton(SetContentBadgeUnselectedTextColor, () => { Shell.Current.ShellContentBadgeViewModel("Content 112").UnselectedTextColor = Color.DarkGreen; }),
+									CreateBadgeButton(SetContentBadgeUnselectedColor, () => { Shell.Current.ShellContentBadgeViewModel("Content 112").UnselectedColor = Color.DarkMagenta; }),
+								}
+							},
+							new StackLayout
+							{
+								Orientation = StackOrientation.Horizontal,
+								Children =
+								{
+									CreateBadgeButton(SetSectionBadgeText, () => { Shell.Current.ShellSectionBadgeViewModel("Section 11").Text = "2"; }),
+									CreateBadgeButton(SetSectionBadgeTextColor, () => { Shell.Current.ShellSectionBadgeViewModel("Section 11").TextColor = Color.DarkBlue; }),
+									CreateBadgeButton(SetSectionBadgeColor, () => { Shell.Current.ShellSectionBadgeViewModel("Section 11").Color = Color.DarkOrange; }),
 								},
 							},
 							new StackLayout
@@ -130,11 +158,29 @@ namespace Xamarin.Forms.Controls.Issues
 								Orientation = StackOrientation.Horizontal,
 								Children =
 								{
-									CreateBadgeButton(SetItemBadgeText, (contentViewModel, sectionViewModel, itemViewModel) => { itemViewModel.Text = "2"; }),
-									CreateBadgeButton(SetItemBadgeTextColor, (contentViewModel, sectionViewModel, itemViewModel) => { itemViewModel.TextColor = Color.DarkBlue; }),
-									CreateBadgeButton(SetItemBadgeColor, (contentViewModel, sectionViewModel, itemViewModel) => { itemViewModel.Color = Color.DarkOrange; }),
+									CreateBadgeButton(SetSectionBadgeUnselectedTextColor, () => { Shell.Current.ShellSectionBadgeViewModel("Section 12").UnselectedTextColor = Color.DarkGreen; }),
+									CreateBadgeButton(SetSectionBadgeUnselectedColor, () => { Shell.Current.ShellSectionBadgeViewModel("Section 12").UnselectedColor = Color.DarkMagenta; }),
 								},
-							}
+							},
+							new StackLayout
+							{
+								Orientation = StackOrientation.Horizontal,
+								Children =
+								{
+									CreateBadgeButton(SetItemBadgeText, () => { Shell.Current.ShellItemBadgeViewModel("Item 1").Text = "2"; }),
+									CreateBadgeButton(SetItemBadgeTextColor, () => { Shell.Current.ShellItemBadgeViewModel("Item 1").TextColor = Color.DarkBlue; }),
+									CreateBadgeButton(SetItemBadgeColor, () => { Shell.Current.ShellItemBadgeViewModel("Item 1").Color = Color.DarkOrange; }),
+								},
+							},
+							new StackLayout
+							{
+								Orientation = StackOrientation.Horizontal,
+								Children =
+								{
+									CreateBadgeButton(SetItemBadgeUnselectedTextColor, () => { Shell.Current.ShellItemBadgeViewModel("Item 2").UnselectedTextColor = Color.DarkGreen; }),
+									CreateBadgeButton(SetItemBadgeUnselectedColor, () => { Shell.Current.ShellItemBadgeViewModel("Item 2").UnselectedColor = Color.DarkMagenta; }),
+								},
+							},
 						}
 					}
 				},
@@ -207,30 +253,12 @@ namespace Xamarin.Forms.Controls.Issues
 		static Button CreateButton(string text, Action<object, EventArgs> action)
 		{
 			Button button = new Button() { Text = text };
-
 			button.Clicked += action.Invoke;
 
 			return button;
 		}
 
-		static Button CreateBadgeButton(string text, Action<BadgeViewModel, BadgeViewModel, BadgeViewModel> action)
-		{
-			return CreateButton(text, (sender, args) =>
-			{
-				Element element = ((Element)sender);
-
-				do
-				{
-					element = element.Parent;
-				} while (!(element is ShellContent));
-
-				ShellContent shellContent = (ShellContent)element;
-
-				action((BadgeViewModel)shellContent.BindingContext,
-					(BadgeViewModel)((ShellSection)shellContent.Parent).BindingContext,
-					(BadgeViewModel)((ShellItem)shellContent.Parent.Parent).BindingContext);
-			});
-		}
+		static Button CreateBadgeButton(string text, Action action) => CreateButton(text, (sender, args) => { action(); });
 
 #if UITEST && __ANDROID__
 		[Test]
@@ -314,6 +342,47 @@ namespace Xamarin.Forms.Controls.Issues
 		}
 
 		[Test]
+		public void SetContentBadgeUnselectedTextColorTest()
+		{
+			Test(SetContentBadgeUnselectedTextColor, () =>
+			{
+				Assert.AreEqual(TextColorDefault, RunningApp.Query(x => x.ContentBadge("Content 112").ContentBadgeTextColor()).Single());
+			}, () =>
+			{
+				Assert.AreEqual(UnselectedTextColorSet, RunningApp.Query(x => x.ContentBadge("Content 112").ContentBadgeTextColor()).Single());
+			});
+		}
+
+		[Test]
+		public void SetSectionBadgeUnselectedTextColorTest()
+		{
+			Test(SetSectionBadgeUnselectedTextColor, () =>
+			{
+				Assert.AreEqual(TextColorDefault, RunningApp.Query(x => x.SectionBadge("Section 12").SectionBadgeTextColor()).Single());
+			}, () =>
+			{
+				Assert.AreEqual(UnselectedTextColorSet, RunningApp.Query(x => x.SectionBadge("Section 12").SectionBadgeTextColor()).Single());
+			});
+		}
+
+		[Test]
+		public void SetItemBadgeUnselectedTextColorTest()
+		{
+			Test(SetItemBadgeUnselectedTextColor, () =>
+			{
+				RunningApp.Tap(ToggleFlyout);
+				RunningApp.WaitForElement("Item 1");
+				Assert.AreEqual(TextColorDefault, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeTextColor()).Single());
+				RunningApp.Tap("Item 1");
+			}, () =>
+			{
+				RunningApp.Tap(ToggleFlyout);
+				RunningApp.WaitForElement("Item 1");
+				Assert.AreEqual(UnselectedTextColorSet, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeTextColor()).Single());
+			});
+		}
+
+		[Test]
 		public void SetContentBadgeColorTest()
 		{
 			Test(SetContentBadgeColor, () =>
@@ -355,6 +424,47 @@ namespace Xamarin.Forms.Controls.Issues
 			});
 		}
 
+		[Test]
+		public void SetContentBadgeUnselectedColorTest()
+		{
+			Test(SetContentBadgeUnselectedColor, () =>
+			{
+				Assert.AreEqual(BadgeColorDefault, RunningApp.Query(x => x.ContentBadge("Content 112").ContentBadgeColor()).Single());
+			}, () =>
+			{
+				Assert.AreEqual(UnselectedColorSet, RunningApp.Query(x => x.ContentBadge("Content 112").ContentBadgeColor()).Single());
+			});
+		}
+
+		[Test]
+		public void SetSectionBadgeUnselectedColorTest()
+		{
+			Test(SetSectionBadgeUnselectedColor, () =>
+			{
+				Assert.AreEqual(BadgeColorDefault, RunningApp.Query(x => x.SectionBadge("Section 12").SectionBadgeColor()).Single());
+			}, () =>
+			{
+				Assert.AreEqual(UnselectedColorSet, RunningApp.Query(x => x.SectionBadge("Section 12").SectionBadgeColor()).Single());
+			});
+		}
+
+		[Test]
+		public void SetItemBadgeUnselectedColorTest()
+		{
+			Test(SetItemBadgeUnselectedColor, () =>
+			{
+				RunningApp.Tap(ToggleFlyout);
+				RunningApp.WaitForElement("Item 1");
+				Assert.AreEqual(BadgeColorDefault, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeColor()).Single());
+				RunningApp.Tap("Item 1");
+			}, () =>
+			{
+				RunningApp.Tap(ToggleFlyout);
+				RunningApp.WaitForElement("Item 1");
+				Assert.AreEqual(UnselectedColorSet, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeColor()).Single());
+			});
+		}
+
 		public void Test(string buttonIdentifier, Action preCondition, Action postCondition)
 		{
 			RunningApp.WaitForElement(buttonIdentifier);
@@ -366,25 +476,47 @@ namespace Xamarin.Forms.Controls.Issues
 #endif
 	}
 
+	public static class ShellExtension
+	{
+		public static BadgeViewModel ShellContentBadgeViewModel(this Shell shell, string title) =>
+			(BadgeViewModel)shell.Items
+			.SelectMany(x => x.Items)
+			.SelectMany(x => x.Items)
+			.Single(x => x.Title == title)
+			.BindingContext;
+
+		public static BadgeViewModel ShellSectionBadgeViewModel(this Shell shell, string title) => 
+			(BadgeViewModel)shell.Items
+			.SelectMany(x => x.Items)
+			.Single(x => x.Title == title)
+			.BindingContext;
+
+		public static BadgeViewModel ShellItemBadgeViewModel(this Shell shell, string title) =>
+			(BadgeViewModel)shell.Items
+			.Single(x => x.Title == title)
+			.BindingContext;
+	}
+
 #if UITEST && __ANDROID__
+
 	public static class AppQueryExtension
 	{
 		// AKA Top Badge
-		public static AppQuery ContentBadge(this AppQuery query)
+		public static AppQuery ContentBadge(this AppQuery query, string content = "Content 111")
 		{
-			return query.Class("AppBarLayout").Descendant().Marked("Content 111");
+			return query.Class("AppBarLayout").Descendant().Marked(content);
 		}
 
 		// AKA Bottom Badge
-		public static AppQuery SectionBadge(this AppQuery query)
+		public static AppQuery SectionBadge(this AppQuery query, string section = "Section 11")
 		{
-			return query.Class("BottomNavigationView").Descendant().Marked("Section 11");
+			return query.Class("BottomNavigationView").Descendant().Marked(section);
 		}
 
 		// AKA Flyout Badge
-		public static AppQuery ItemBadge(this AppQuery query)
+		public static AppQuery ItemBadge(this AppQuery query, int index = 1)
 		{
-			return query.Class("RecyclerView").Class("FrameRenderer").Index(0);
+			return query.Class("RecyclerView").Class("FrameRenderer").Index(index - 1);
 		}
 
 		public static AppQuery ContentBadgeText(this AppQuery query, string text)
