@@ -388,6 +388,7 @@ namespace Xamarin.Forms.Platform.Android
 			{
 				SetupMenu();
 			}
+			// TODO: More text
 			else if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
 				e.PropertyName == BaseShellItem.BadgeColorProperty.PropertyName ||
 				e.PropertyName == BaseShellItem.BadgeTextColorProperty.PropertyName ||

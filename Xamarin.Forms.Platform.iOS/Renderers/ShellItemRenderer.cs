@@ -218,7 +218,7 @@ namespace Xamarin.Forms.Platform.iOS
 
 				if (willUseMore)
 				{
-					ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
+					ApplyBadge(ShellItem, ShellItem.BadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
 				}
 			}
 
@@ -245,9 +245,9 @@ namespace Xamarin.Forms.Platform.iOS
 				TabBar.Items[index].Enabled = shellSection.IsEnabled;
 			}
 			else if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
-				e.PropertyName == nameof(BaseShellItem.BadgeEffectiveColor) ||
-				e.PropertyName == nameof(BaseShellItem.BadgeEffectiveTextColor) ||
-				e.PropertyName == nameof(BaseShellItem.EffectiveBadgeMoreText))
+				e.PropertyName == BaseShellItem.BadgeEffectiveTextColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeEffectiveColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeMoreTextProperty.PropertyName)
 			{
 				var shellSection = (ShellSection)sender;
 				var renderer = RendererForShellContent(shellSection);
@@ -255,7 +255,7 @@ namespace Xamarin.Forms.Platform.iOS
 
 				if (renderer.IsInMoreTab)
 				{
-					ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
+					ApplyBadge(ShellItem, ShellItem.BadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
 				}
 				else
 				{
@@ -331,7 +331,7 @@ namespace Xamarin.Forms.Platform.iOS
 
 			if (willUseMore)
 			{
-				ApplyBadge(ShellItem, ShellItem.EffectiveBadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
+				ApplyBadge(ShellItem, ShellItem.BadgeMoreText, ShellItem.Items.Skip(maxTabs - 1).Any(x => x.IsChecked), TabBar.Items[maxTabs - 1]);
 			}
 		}
 

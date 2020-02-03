@@ -211,6 +211,10 @@ namespace Xamarin.Forms.Platform.iOS
 				UnhookEvents();
 
 				ShellSection = null;
+
+				_shellContentToCellMapping.Clear();
+				_shellContentToCellMapping = null;
+
 				_bar.RemoveFromSuperview();
 				_bar.Dispose();
 				_bar = null;
@@ -299,8 +303,8 @@ namespace Xamarin.Forms.Platform.iOS
 		void OnShellContentPropertyChanged(object sender, PropertyChangedEventArgs e)
 		{
 			if (e.PropertyName == BaseShellItem.BadgeTextProperty.PropertyName ||
-				e.PropertyName == nameof(BaseShellItem.BadgeEffectiveColor) ||
-				e.PropertyName == nameof(BaseShellItem.BadgeEffectiveTextColor))
+				e.PropertyName == BaseShellItem.BadgeEffectiveTextColorProperty.PropertyName ||
+				e.PropertyName == BaseShellItem.BadgeEffectiveColorProperty.PropertyName)
 			{
 				var shellContent = (ShellContent)sender;
 				var headerCell = _shellContentToCellMapping[shellContent];
@@ -354,7 +358,10 @@ namespace Xamarin.Forms.Platform.iOS
 
 				Label.Frame = Bounds;
 
-				var bounds = new CGRect(0, 0, BadgeLabel.IntrinsicContentSize.Width + 10, BadgeLabel.IntrinsicContentSize.Height + 2);
+				nfloat height = BadgeLabel.IntrinsicContentSize.Height + 2;
+				nfloat width = BadgeLabel.IntrinsicContentSize.Width + 10;
+
+				var bounds = new CGRect(0, 0, width > height ? width : height, height);
 				bounds.Offset(Label.IntrinsicContentSize.Width + ((Bounds.Width - Label.IntrinsicContentSize.Width) / 2) - 6, (Bounds.Height - Label.IntrinsicContentSize.Height) / 2.0f - 8);
 
 				BadgeLabel.Frame = bounds;
@@ -362,8 +369,6 @@ namespace Xamarin.Forms.Platform.iOS
 
 			public override CGSize SizeThatFits(CGSize size)
 			{
-				CGSize sizeThatFits = BadgeLabel.SizeThatFits(size);
-
 				return new CGSize(Label.SizeThatFits(size).Width + 30, 35);
 			}
 
