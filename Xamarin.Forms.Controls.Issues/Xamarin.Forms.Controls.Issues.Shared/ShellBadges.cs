@@ -56,6 +56,7 @@ namespace Xamarin.Forms.Controls.Issues
 		const string SetItemBadgeUnselectedColor = "IBUC";
 
 #if __ANDROID__
+		// Color.White.ToAndroid().ToArgb()
 		protected int TextColorDefault = -1;
 
 		// Color.DarkBlue.ToAndroid().ToArgb();
@@ -372,13 +373,13 @@ namespace Xamarin.Forms.Controls.Issues
 			{
 				RunningApp.Tap(ToggleFlyout);
 				RunningApp.WaitForElement("Item 1");
-				Assert.AreEqual(TextColorDefault, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeTextColor()).Single());
+				Assert.AreEqual(TextColorDefault, RunningApp.Query(x => x.ItemBadge("Item 2").ItemBadgeTextColor()).Single());
 				RunningApp.Tap("Item 1");
 			}, () =>
 			{
 				RunningApp.Tap(ToggleFlyout);
 				RunningApp.WaitForElement("Item 1");
-				Assert.AreEqual(UnselectedTextColorSet, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeTextColor()).Single());
+				Assert.AreEqual(UnselectedTextColorSet, RunningApp.Query(x => x.ItemBadge("Item 2").ItemBadgeTextColor()).Single());
 			});
 		}
 
@@ -455,13 +456,13 @@ namespace Xamarin.Forms.Controls.Issues
 			{
 				RunningApp.Tap(ToggleFlyout);
 				RunningApp.WaitForElement("Item 1");
-				Assert.AreEqual(BadgeColorDefault, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeColor()).Single());
+				Assert.AreEqual(BadgeColorDefault, RunningApp.Query(x => x.ItemBadge("Item 2").ItemBadgeColor()).Single());
 				RunningApp.Tap("Item 1");
 			}, () =>
 			{
 				RunningApp.Tap(ToggleFlyout);
 				RunningApp.WaitForElement("Item 1");
-				Assert.AreEqual(UnselectedColorSet, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeColor()).Single());
+				Assert.AreEqual(UnselectedColorSet, RunningApp.Query(x => x.ItemBadge("Item 2").ItemBadgeColor()).Single());
 			});
 		}
 
@@ -514,9 +515,9 @@ namespace Xamarin.Forms.Controls.Issues
 		}
 
 		// AKA Flyout Badge
-		public static AppQuery ItemBadge(this AppQuery query, int index = 1)
+		public static AppQuery ItemBadge(this AppQuery query, string item = "Item 1")
 		{
-			return query.Class("RecyclerView").Class("FrameRenderer").Index(index - 1);
+			return query.Raw($"* marked:'{item}' parent * index:1 descendant FrameRenderer");
 		}
 
 		public static AppQuery ContentBadgeText(this AppQuery query, string text)
