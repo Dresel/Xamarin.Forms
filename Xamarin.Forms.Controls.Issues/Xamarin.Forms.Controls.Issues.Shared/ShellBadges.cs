@@ -56,6 +56,7 @@ namespace Xamarin.Forms.Controls.Issues
 		const string SetItemBadgeUnselectedColor = "IBUC";
 
 #if __ANDROID__
+		// Color.White.ToAndroid().ToArgb();
 		protected int TextColorDefault = -1;
 
 		// Color.DarkBlue.ToAndroid().ToArgb();
@@ -72,6 +73,25 @@ namespace Xamarin.Forms.Controls.Issues
 
 		// Color.DarkMagenta.ToAndroid().ToArgb();
 		protected int UnselectedColorSet = -7667573;
+#endif
+
+#if __IOS__
+		protected string TextColorDefault = "rgb(255,255,255)";
+
+		// Color.DarkBlue.ToAndroid().ToArgb();
+		protected string TextColorSet = "rgb(0,0,139)";
+
+		// Color.DarkGreen.ToAndroid().ToArgb();
+		protected string UnselectedTextColorSet = "rgb(0,100,0)";
+
+		// Color.FromRgb(255, 59, 48).ToAndroid().ToArgb();
+		protected string BadgeColorDefault = "rgb(255,59,48)";
+
+		// Color.DarkOrange.ToAndroid().ToArgb()
+		protected string BadgeColorSet = "rgb(255,140,0)";
+
+		// Color.DarkMagenta.ToAndroid().ToArgb();
+		protected string UnselectedColorSet = "rgb(139,0,139)";
 #endif
 
 		// Test implicit ShellItem, ShellSection
@@ -260,7 +280,16 @@ namespace Xamarin.Forms.Controls.Issues
 
 		static Button CreateBadgeButton(string text, Action action) => CreateButton(text, (sender, args) => { action(); });
 
-#if UITEST && __ANDROID__
+#if UITEST && (__IOS__ || __ANDROID__)
+		public void Test(string buttonIdentifier, Action preCondition, Action postCondition)
+		{
+			RunningApp.WaitForElement(buttonIdentifier);
+
+			preCondition();
+			RunningApp.Tap(buttonIdentifier);
+			postCondition();
+		}
+
 		[Test]
 		public void SetContentBadgeTextTest()
 		{
@@ -278,10 +307,10 @@ namespace Xamarin.Forms.Controls.Issues
 		{
 			Test(SetSectionBadgeText, () =>
 			{
-				RunningApp.WaitForElement(x => x.SectionBadge().ContentBadgeText("1"));
+				RunningApp.WaitForElement(x => x.SectionBadge().SectionBadgeText("1"));
 			}, () =>
 			{
-				RunningApp.WaitForElement(x => x.SectionBadge().ContentBadgeText("2"));
+				RunningApp.WaitForElement(x => x.SectionBadge().SectionBadgeText("2"));
 			});
 		}
 
@@ -372,13 +401,13 @@ namespace Xamarin.Forms.Controls.Issues
 			{
 				RunningApp.Tap(ToggleFlyout);
 				RunningApp.WaitForElement("Item 1");
-				Assert.AreEqual(TextColorDefault, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeTextColor()).Single());
+				Assert.AreEqual(TextColorDefault, RunningApp.Query(x => x.ItemBadge("Item 2").ItemBadgeTextColor()).Single());
 				RunningApp.Tap("Item 1");
 			}, () =>
 			{
 				RunningApp.Tap(ToggleFlyout);
 				RunningApp.WaitForElement("Item 1");
-				Assert.AreEqual(UnselectedTextColorSet, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeTextColor()).Single());
+				Assert.AreEqual(UnselectedTextColorSet, RunningApp.Query(x => x.ItemBadge("Item 2").ItemBadgeTextColor()).Single());
 			});
 		}
 
@@ -455,23 +484,14 @@ namespace Xamarin.Forms.Controls.Issues
 			{
 				RunningApp.Tap(ToggleFlyout);
 				RunningApp.WaitForElement("Item 1");
-				Assert.AreEqual(BadgeColorDefault, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeColor()).Single());
+				Assert.AreEqual(BadgeColorDefault, RunningApp.Query(x => x.ItemBadge("Item 2").ItemBadgeColor()).Single());
 				RunningApp.Tap("Item 1");
 			}, () =>
 			{
 				RunningApp.Tap(ToggleFlyout);
 				RunningApp.WaitForElement("Item 1");
-				Assert.AreEqual(UnselectedColorSet, RunningApp.Query(x => x.ItemBadge(2).ItemBadgeColor()).Single());
+				Assert.AreEqual(UnselectedColorSet, RunningApp.Query(x => x.ItemBadge("Item 2").ItemBadgeColor()).Single());
 			});
-		}
-
-		public void Test(string buttonIdentifier, Action preCondition, Action postCondition)
-		{
-			RunningApp.WaitForElement(buttonIdentifier);
-
-			preCondition();
-			RunningApp.Tap(buttonIdentifier);
-			postCondition();
 		}
 #endif
 	}
@@ -497,6 +517,76 @@ namespace Xamarin.Forms.Controls.Issues
 			.BindingContext;
 	}
 
+#if UITEST && __IOS__
+
+	public static class AppQueryExtension
+	{
+		// AKA Top Badge
+		public static AppQuery ContentBadge(this AppQuery query, string content = "Content 111")
+		{
+			return query.Raw($"view marked:'{content}' sibling UILabel");
+		}
+
+		// AKA Bottom Badge
+		public static AppQuery SectionBadge(this AppQuery query, string section = "Section 11")
+		{
+			return query.Raw($"UITabBarButton marked:'{section}'");
+		}
+
+		// AKA Flyout Badge
+		public static AppQuery ItemBadge(this AppQuery query, string item = "Item 1")
+		{
+			return query.Raw($"view marked:'{item}' parent view index:0 sibling view:'Xamarin_Forms_ControlGallery_iOS_PerformanceTrackingFrame'");
+		}
+
+		public static AppQuery ContentBadgeText(this AppQuery query, string text)
+		{
+			return query.Text(text);
+		}
+
+		public static AppQuery SectionBadgeText(this AppQuery query, string text)
+		{
+			return query.Class("UILabel").Index(1).Text(text);
+		}
+
+		public static AppQuery ItemBadgeText(this AppQuery query, string text)
+		{
+			return query.Raw("descendant UILabel").Text(text);
+		}
+
+		public static AppTypedSelector<string> ContentBadgeTextColor(this AppQuery query)
+		{
+			return query.Invoke("color").Invoke("styleString").Value<string>();
+		}
+
+		public static AppTypedSelector<string> SectionBadgeTextColor(this AppQuery query)
+		{
+			return query.Class("UILabel").Index(1).Invoke("color").Invoke("styleString").Value<string>();
+		}	
+
+		public static AppTypedSelector<string> ItemBadgeTextColor(this AppQuery query)
+		{
+			return query.Raw("descendant UILabel").Invoke("color").Invoke("styleString").Value<string>();
+		}
+
+		public static AppTypedSelector<string> ContentBadgeColor(this AppQuery query)
+		{
+			return query.Invoke("backgroundColor").Invoke("styleString").Value<string>();
+		}
+
+		public static AppTypedSelector<string> SectionBadgeColor(this AppQuery query)
+		{
+			return query.Raw("descendant view:'_UIBadgeView'").Invoke("backgroundColor").Invoke("styleString").Value<string>();
+		}
+
+		public static AppTypedSelector<string> ItemBadgeColor(this AppQuery query)
+		{
+			return query.Invoke("backgroundColor").Invoke("styleString").Value<string>();
+		}
+	}
+
+#endif
+
 #if UITEST && __ANDROID__
 
 	public static class AppQueryExtension
@@ -514,9 +604,9 @@ namespace Xamarin.Forms.Controls.Issues
 		}
 
 		// AKA Flyout Badge
-		public static AppQuery ItemBadge(this AppQuery query, int index = 1)
+		public static AppQuery ItemBadge(this AppQuery query, string item = "Item 1")
 		{
-			return query.Class("RecyclerView").Class("FrameRenderer").Index(index - 1);
+			return query.Raw($"* marked:'{item}' parent * index:1 descendant FrameRenderer");
 		}
 
 		public static AppQuery ContentBadgeText(this AppQuery query, string text)
